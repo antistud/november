@@ -19,7 +19,8 @@ namespace November.Dotnet.Controllers
         {
             var dbUser = ConfigDb.username;
             var password = ConfigDb.password;
-            client = new MongoClient($"mongodb+srv://{dbUser}:{password}@cluster0-a2vtd.gcp.mongodb.net/test?retryWrites=true&w=majority");
+            var host = ConfigDb.host;
+            client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/test?retryWrites=true&w=majority");
             db = client.GetDatabase("test");
             collection = db.GetCollection<User>("user");
 
