@@ -1,94 +1,62 @@
-import React, { useState } from "react";
-
-import Jumbotron from "react-bootstrap/Jumbotron";
-import Toast from "react-bootstrap/Toast";
-import Container from "react-bootstrap/Container";
-import Navbar from "react-bootstrap/Navbar";
-import NavDropdown from "react-bootstrap/NavDropdown";
-import Nav from "react-bootstrap/Nav";
-import Form from "react-bootstrap/Form";
-import FormControl from "react-bootstrap/FormControl";
-import Button from "react-bootstrap/Button";
+import React, { Component } from "react";
+import GameLibrary from "./components/GameLibrary";
 import "./App.css";
-import { Switch, Route, Link } from 'react-router-dom'
+import gameSearch from "./services/SearchGames";
+import AppNavbar from "./components/AppNavbar";
+import GameSearchBox from "./components/GameSearchBox";
+import { Container } from "react-bootstrap";
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      apptitle: "BoxShare",
+      games: []
+    };
+  }
 
-const ExampleToast = ({ children }) => {
-  const [show, toggleShow] = useState(true);
+  //toggle game availability
+  markAvailable = id => {
+    this.setState({
+      games: this.state.games.map(game => {
+        if (game.id === id) {
+          game.available = !game.available;
+        }
+        return game;
+      })
+    });
+  };
 
-  return (
-    <Toast show={show} onClose={() => toggleShow(!show)}>
-      <Toast.Header>
-        <strong className="mr-auto">React-Bootstrap</strong>
-      </Toast.Header>
-      <Toast.Body>{children}</Toast.Body>
-    </Toast>
-  );
-};
+  gameSearch = searchstring => {
+    gameSearch(
+      "https://www.boardgameatlas.com/api/search?name=" +
+        searchstring +
+        "&limit=10&client_id=PaLV4upJP7"
+    ).then(response => {
+      console.log(response.data.games);
+      this.setState({
+        games: response.data.games
+      });
+      return response.data.games;
+    });
 
+    console.log(this.state.games);
+  };
 
-
-const NavBarExample = () => {
-  return (
-    <Navbar bg="light" expand="lg">
-      <Navbar.Brand href="#home">Tabletop Share</Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
-          <NavDropdown title="Menu" id="basic-nav-dropdown">
-            <NavDropdown.Item><Link to='/schedule'>Schedule</Link></NavDropdown.Item>
-            <NavDropdown.Item >
-              <Link to='/roster'>Roster</Link>
-            </NavDropdown.Item>
-            <NavDropdown.Item ><Link to='/'>Home</Link></NavDropdown.Item>
-            <NavDropdown.Divider />
-            <NavDropdown.Item href="#action/3.4">
-              Separated link
-            </NavDropdown.Item>
-          </NavDropdown>
-        </Nav>
-      </Navbar.Collapse>
-    </Navbar>
-  );
-};
-
-function Main() {
-  return (
-    <main>
-      <Switch>
-        <Route exact path='/' component={Home} />
-        <Route path='/roster' component={Roster} />
-        <Route path='/schedule' component={Schedule} />
-      </Switch>
-    </main>
-  );
+  render() {
+    return (
+      <div className="App">
+        <AppNavbar apptitle={this.state.apptitle}></AppNavbar>
+        <Container className="p-3">
+          <GameSearchBox gameSearch={this.gameSearch} />
+          <br />
+          <GameLibrary
+            games={this.state.games}
+            markAvailable={this.markAvailable}
+          />
+        </Container>
+      </div>
+    );
+  }
 }
-const Home = () => (
-  <div>
-    <p>Home</p>
-  </div>
-
-);
-const Roster = () => (
-  <div>
-    <p>Roster</p>
-  </div>
-
-);
-const Schedule = () => (
-  <div>
-    <p>Schedule</p>
-  </div>
-
-);
-const App = () => (
-  <div>
-
-    <NavBarExample />
-    <Main />
-
-
-  </div>
-
-);
 
 export default App;
