@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
 
 namespace November.Dotnet.Controllers
@@ -66,7 +67,7 @@ namespace November.Dotnet.Controllers
             }
             if (found == false)
             {
-                return "missing password or wrong";
+                return "missing or wrong password";
             }
             else
             {
@@ -74,6 +75,21 @@ namespace November.Dotnet.Controllers
                 return sid;
             }
 
+        }
+        [HttpDelete]
+        public string Delete([FromBody] UserAuth body)
+        {
+
+            if (CheckSessionId() != false)
+            {
+                var session_id = Request.Headers["Authorization"];
+                c_sessions.DeleteOne(a => a.session_id == session_id);
+                return "true";
+            }
+            else
+            {
+                return "false";
+            };
         }
         public string Default()
         {
