@@ -2,15 +2,6 @@ import React, { Component } from "react";
 import { Image } from "react-bootstrap";
 import "../App.css";
 export class GameInfo extends Component {
-  getStyle = () => {
-    return {
-      background: "#ff4f4f4",
-      padding: "10px",
-      borderBottom: "1px #ccc dotted",
-      color: this.props.game.available ? "green" : "red"
-    };
-  };
-
   render() {
     const { id, name, images } = this.props.game;
     return (
@@ -19,6 +10,12 @@ export class GameInfo extends Component {
           <Image className="gameImage" src={images.small}></Image>
         </td>
         <td>{name}</td>
+        <td>
+          <i
+            className="fas fa-folder-plus fa-fw fa-3x"
+            onClick={this.props.saveGame.bind(this, this.props.game)}
+          ></i>
+        </td>
       </tr>
     );
   }
