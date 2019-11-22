@@ -21,15 +21,24 @@ namespace November.Dotnet.Controllers
             var password = ConfigDb.password;
             var host = ConfigDb.host;
             client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/test?retryWrites=true&w=majority");
-            db = client.GetDatabase("test");
-            collection = db.GetCollection<User>("user");
+            db = client.GetDatabase("november");
+            collection = db.GetCollection<User>("auth");
 
         }
         [HttpGet]
         public string Get()
         {
-
             return "success";
+        }
+
+        public string Post(string username, string password)
+        {
+            return "success";
+        }
+
+        public bool IsAuth(string session_id)
+        {
+            return true;
         }
     }
 }
