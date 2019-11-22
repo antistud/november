@@ -75,7 +75,10 @@ namespace November.Dotnet.Controllers
             }
 
         }
-
+        public string Default()
+        {
+            return "Method Not Found";
+        }
         string CreateSessionId()
         {
 
