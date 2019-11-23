@@ -42,3 +42,4 @@ C:/Users/jon/Documents/projects/november/November.Dotnet/obj/Debug/netcoreapp3.0
 /Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/obj/Debug/netcoreapp3.0/November.Dotnet.dll
 /Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/obj/Debug/netcoreapp3.0/November.Dotnet.pdb
 /Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/Newtonsoft.Json.dll
+/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/SendGrid.dll

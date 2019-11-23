@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace November.Dotnet.Controllers
 {
@@ -20,6 +22,11 @@ namespace November.Dotnet.Controllers
         public IMongoCollection<UserAuth> c_auth;
         public IMongoCollection<UserSession> c_sessions;
         public IMongoCollection<UserProfile> c_profile;
+        public string sg_apiKey;
+        public SendGridClient sg_client;
+        public EmailAddress sg_from;
+
+
         public AuthController()
         {
             var dbUser = ConfigDb.username;
@@ -31,6 +38,10 @@ namespace November.Dotnet.Controllers
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
 
+            //Send Grid 
+            sg_apiKey = ConfigSendGrid.sendGridApi;
+            sg_client = new SendGridClient(sg_apiKey);
+            sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
         [HttpGet]
         public string Get()
@@ -46,6 +57,17 @@ namespace November.Dotnet.Controllers
                 return "false";
             };
 
+        }
+        [HttpPut]
+        public string Put([FromQuery] string email, [FromBody] string url)
+        {
+            var sg_subject = "This is going to be Fun!!!";
+            var sg_to = new EmailAddress(email);
+            var sg_plainTextContent = "You have requested to be a part of something special.  All you have to do now is click the link " + url;
+            var sg_htmlContent = $"<strong>You have requested to be a part of something special.</strong><br>All you have to do now is click the link<br><br><a href='{url}'>Go</a>";
+            var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
+            var sg_response = sg_client.SendEmailAsync(sg_msg);
+            return "success";
         }
         [HttpPost]
         public string Post([FromBody] UserAuth body)
