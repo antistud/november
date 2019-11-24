@@ -6271,19 +6271,19 @@
     ]
   },
   "packageFolders": {
-    "/Users/jonrhoades/.nuget/packages/": {}
+    "C:\\Users\\jon\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/November.Dotnet.csproj",
+      "projectUniqueName": "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\November.Dotnet.csproj",
       "projectName": "November.Dotnet",
-      "projectPath": "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/November.Dotnet.csproj",
-      "packagesPath": "/Users/jonrhoades/.nuget/packages/",
-      "outputPath": "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/obj/",
+      "projectPath": "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\November.Dotnet.csproj",
+      "packagesPath": "C:\\Users\\jon\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/jonrhoades/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\jon\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.0"
@@ -6336,7 +6336,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.0.100/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

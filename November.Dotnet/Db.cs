@@ -1,5 +1,15 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
+using MongoDB.Driver.Builders;
+using Newtonsoft.Json;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 
 namespace November.Dotnet
 {
@@ -22,6 +32,15 @@ namespace November.Dotnet
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
 
+        }
+
+
+        public Object Profile(string session_id)
+        {
+            var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
+            var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
+
+            return profile;
         }
     }
 }

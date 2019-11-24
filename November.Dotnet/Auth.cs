@@ -68,6 +68,7 @@ namespace November.Dotnet
         public string username { get; set; }
         public ObjectId user_id { get; set; }
         public string name { get; set; }
+        public string email { get; set; }
     }
     public class UserPassword
     {
