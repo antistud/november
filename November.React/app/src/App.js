@@ -88,6 +88,7 @@ class App extends Component {
                   <GameSearch
                     games={this.state.games}
                     saveGame={this.saveGame}
+                    gamelibrary={this.state.gamelibrary}
                   />
                 </React.Fragment>
               )}
