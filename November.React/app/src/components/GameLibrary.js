@@ -20,17 +20,20 @@ export class GameLibrary extends Component {
     console.log("gamelibrary render");
     if (this.props.gamelibrary !== null) {
       return (
-        <Table striped bordered hover>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Name</th>
-              <th></th>
-            </tr>
-          </thead>
+        <React.Fragment>
+          <h2>{this.props.username}'s library</h2>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Name</th>
+                <th></th>
+              </tr>
+            </thead>
 
-          <tbody>{this.renderTableData()}</tbody>
-        </Table>
+            <tbody>{this.renderTableData()}</tbody>
+          </Table>
+        </React.Fragment>
       );
     } else {
       return null;

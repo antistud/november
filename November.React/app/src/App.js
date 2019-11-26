@@ -15,7 +15,9 @@ class App extends Component {
     this.state = {
       apptitle: "BoxShare",
       games: [],
-      gamelibrary: []
+      gamelibrary: [],
+      username: "jfloth",
+      uderId: "1"
     };
   }
 
@@ -72,11 +74,17 @@ class App extends Component {
     return (
       <Router>
         <div className="App">
-          <AppNavbar apptitle={this.state.apptitle}></AppNavbar>
+          <AppNavbar
+            username={this.state.username}
+            apptitle={this.state.apptitle}
+          ></AppNavbar>
 
           <Container className="p-3">
             <Route exact path="/">
-              <Homepage gamelibrary={this.state.gamelibrary}></Homepage>
+              <Homepage
+                username={this.state.username}
+                gamelibrary={this.state.gamelibrary}
+              ></Homepage>
             </Route>
             <Route
               exact

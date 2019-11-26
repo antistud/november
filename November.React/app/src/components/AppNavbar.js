@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export class AppNavbar extends Component {
   render() {
     return (
-      <Navbar bg="light" expand="lg">
+      <Navbar sticky="top" bg="light" expand="lg">
         <Navbar.Brand href="/">{this.props.apptitle}</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
@@ -17,6 +17,11 @@ export class AppNavbar extends Component {
               </NavDropdown.Item>
             </NavDropdown>
           </Nav>
+        </Navbar.Collapse>
+        <Navbar.Collapse className="justify-content-end">
+          <Navbar.Text>
+            Signed in as: <a>{this.props.username}</a>
+          </Navbar.Text>
         </Navbar.Collapse>
       </Navbar>
     );

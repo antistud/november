@@ -4,7 +4,10 @@ export class Homepage extends Component {
   render() {
     return (
       <React.Fragment>
-        <GameLibrary gamelibrary={this.props.gamelibrary} />
+        <GameLibrary
+          username={this.props.username}
+          gamelibrary={this.props.gamelibrary}
+        />
       </React.Fragment>
     );
   }
