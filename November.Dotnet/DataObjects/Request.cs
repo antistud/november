@@ -1,12 +1,18 @@
 using System;
+using MongoDB.Bson;
 
 namespace November.Dotnet
 {
     public class GameRequest
     {
-        public static string username = "[username]";
-        public static string password = "[password]";
-        public static string host = "[host]";
-        public static string salt = "[salt]";
+        public ObjectId _id { get; set; }
+        public ObjectId user_id { get; set; }
+        public ObjectId game_id { get; set; }
+        public DateTime send_sent { get; set; }
+        public DateTime send_recieved { get; set; }
+        public DateTime return_sent { get; set; }
+        public DateTime return_recieved { get; set; }
+        public int requester_rating { get; set; }
+        public int lender_rating { get; set; }
     }
 }
