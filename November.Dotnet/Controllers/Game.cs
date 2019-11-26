@@ -16,30 +16,30 @@ namespace November.Dotnet.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class CollectionController : ControllerBase
+    public class GameController : ControllerBase
     {
         public IMongoClient client;
         public IMongoDatabase db;
-        public IMongoCollection<UserAuth> c_auth;
+        public IMongoCollection<User> c_auth;
         public IMongoCollection<UserSession> c_sessions;
         public IMongoCollection<UserProfile> c_profile;
         public string sg_apiKey;
         public SendGridClient sg_client;
         public EmailAddress sg_from;
-        public IMongoCollection<Collection> c_collection;
+        public IMongoCollection<UserGame> c_game;
 
 
-        public CollectionController()
+        public GameController()
         {
             var dbUser = ConfigDb.username;
             var password = ConfigDb.password;
             var host = ConfigDb.host;
             client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/november?retryWrites=true&w=majority");
             db = client.GetDatabase("november");
-            c_auth = db.GetCollection<UserAuth>("auth");
+            c_auth = db.GetCollection<User>("auth");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
-            c_collection = db.GetCollection<Collection>("collection");
+            c_game = db.GetCollection<UserGame>("game");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
@@ -54,11 +54,8 @@ namespace November.Dotnet.Controllers
             {
 
                 var profile = Profile();
-                var docs = c_collection.Find(x => x.user_id == profile.user_id).ToList().First();
-                var json = JsonConvert.SerializeObject(docs.games);
-                var games = json.Replace("\"", "").Replace("[", "").Replace("]", "");
-                var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=PaLV4upJP7&ids=" + games);
-                return api;
+                var docs = c_game.Find(x => x.user_id == profile.user_id).ToList().First();
+                return "hello";
             }
             else
             {
@@ -72,13 +69,13 @@ namespace November.Dotnet.Controllers
             return "Success";
         }
         [HttpPost]
-        public string Post([FromBody] UserAuth body)
+        public string Post([FromBody] User body)
         {
             return "Success";
 
         }
         [HttpDelete]
-        public string Delete([FromBody] UserAuth body)
+        public string Delete([FromBody] User body)
         {
             return "Success";
         }

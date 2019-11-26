@@ -19,7 +19,7 @@ namespace November.Dotnet.Controllers
     {
         public IMongoClient client;
         public IMongoDatabase db;
-        public IMongoCollection<UserAuth> c_auth;
+        public IMongoCollection<User> c_auth;
         public IMongoCollection<UserSession> c_sessions;
         public IMongoCollection<UserProfile> c_profile;
         public string sg_apiKey;
@@ -34,7 +34,7 @@ namespace November.Dotnet.Controllers
             var host = ConfigDb.host;
             client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/november?retryWrites=true&w=majority");
             db = client.GetDatabase("november");
-            c_auth = db.GetCollection<UserAuth>("auth");
+            c_auth = db.GetCollection<User>("auth");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
 
@@ -70,11 +70,11 @@ namespace November.Dotnet.Controllers
             return "success";
         }
         [HttpPost]
-        public string Post([FromBody] UserAuth body)
+        public string Post([FromBody] User body)
         {
             var docs = c_auth.Find(x => x.username == body.username).ToList();
             var sid = "";
-            List<UserAuth> results = new List<UserAuth>();
+            List<User> results = new List<User>();
             var found = false;
             foreach (var d in docs)
             {
@@ -99,7 +99,7 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpDelete]
-        public string Delete([FromBody] UserAuth body)
+        public string Delete([FromBody] User body)
         {
 
             if (CheckSessionId() != false)
