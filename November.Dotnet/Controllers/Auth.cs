@@ -14,7 +14,7 @@ using SendGrid.Helpers.Mail;
 namespace November.Dotnet.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Auth")]
     public class AuthController : ControllerBase
     {
         public IMongoClient client;

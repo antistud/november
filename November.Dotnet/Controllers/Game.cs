@@ -16,7 +16,7 @@ using SendGrid.Helpers.Mail;
 namespace November.Dotnet.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("Game")]
     public class GameController : ControllerBase
     {
         public IMongoClient client;
@@ -28,8 +28,9 @@ namespace November.Dotnet.Controllers
         public SendGridClient sg_client;
         public EmailAddress sg_from;
         public IMongoCollection<UserGame> c_game;
+        public IMongoCollection<GamePlay> c_play;
 
-
+        public IMongoCollection<GameRequest> c_request;
         public GameController()
         {
             var dbUser = ConfigDb.username;
@@ -41,12 +42,15 @@ namespace November.Dotnet.Controllers
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
             c_game = db.GetCollection<UserGame>("game");
+            c_play = db.GetCollection<GamePlay>("play");
+            c_request = db.GetCollection<GameRequest>("request");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
             sg_client = new SendGridClient(sg_apiKey);
             sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
+
         [HttpGet]
         public string Get()
         {
@@ -80,6 +84,66 @@ namespace November.Dotnet.Controllers
                 return "false";
             };
 
+        }
+        [Route("{gameId}")]
+        [HttpGet]
+        public string GetId(string gameId, [FromQuery] bool atlas, [FromQuery] bool play, [FromQuery] bool request)
+        {
+            var game_id = ObjectId.Parse(gameId);
+            if (CheckSessionId() != false)
+            {
+
+                var profile = Profile();
+                try
+                {
+                    var docs = c_game.Find(x => x._id == game_id).ToList().First();
+                    if (atlas == true)
+                    {
+                        try
+                        {
+                            var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=PaLV4upJP7&ids=" + docs.atlas_id);
+                            docs.atlas = JsonConvert.DeserializeObject(api);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    if (play == true)
+                    {
+                        try
+                        {
+                            docs.play = c_play.Find(x => x.game_id == game_id).ToList().First();
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    if (request == true)
+                    {
+                        try
+                        {
+                            docs.request = c_request.Find(x => x.game_id == game_id).ToList().First();
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    var json = JsonConvert.SerializeObject(docs);
+                    return json;
+                }
+                catch
+                {
+                    return "no games";
+                }
+
+            }
+            else
+            {
+                return "false";
+            };
         }
         [HttpPut]
         public string Put([FromBody] UserGame body)
