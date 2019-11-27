@@ -16,7 +16,7 @@ namespace November.Dotnet
     }
     public class ConfigAtlasExample
     {
-        public static string client_id = "atlas_clientid";
+        public static string client_id = "[atlas_clientid]";
 
     }
 }
