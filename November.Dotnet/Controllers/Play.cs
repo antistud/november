@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace November.Dotnet.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class PlayController : ControllerBase
     {
         public IMongoClient client;
         public IMongoDatabase db;
@@ -25,9 +26,10 @@ namespace November.Dotnet.Controllers
         public string sg_apiKey;
         public SendGridClient sg_client;
         public EmailAddress sg_from;
+        public IMongoCollection<UserGame> c_game;
 
 
-        public AuthController()
+        public PlayController()
         {
             var dbUser = ConfigDb.username;
             var password = ConfigDb.password;
@@ -37,6 +39,7 @@ namespace November.Dotnet.Controllers
             c_auth = db.GetCollection<User>("user");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
+            c_game = db.GetCollection<UserGame>("play");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
@@ -44,91 +47,31 @@ namespace November.Dotnet.Controllers
             sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
         [HttpGet]
-        public string Get()
+        public string Get([FromQuery] GamePlay body)
         {
-            if (CheckSessionId() != false)
-            {
 
-
-                return JsonConvert.SerializeObject(Profile());
-            }
-            else
-            {
-                return "false";
-            };
+            return "Comeing Soon";
 
         }
         [HttpPut]
-        public string Put([FromBody] UserPut body)
+        public string Put([FromQuery] string email, [FromBody] string url)
         {
-            var sg_subject = "This is going to be Fun!!!";
-            var sg_to = new EmailAddress(body.email);
-            var sg_plainTextContent = "You have requested to be a part of something special.  All you have to do now is click the link " + body.url;
-            var sg_htmlContent = $"<strong>You have requested to be a part of something special.</strong><br>All you have to do now is click the link<br><br><a href='{body.url}'>Go</a>";
-            var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
-            var sg_response = sg_client.SendEmailAsync(sg_msg);
-            return "success";
+            return "Success";
         }
         [HttpPost]
         public string Post([FromBody] User body)
         {
-            var docs = c_auth.Find(x => x.username == body.username).ToList();
-            var sid = "";
-            List<User> results = new List<User>();
-            var found = false;
-            foreach (var d in docs)
-            {
-                if (d.hash == UserPassword.HashPassword(body.password))
-                {
-                    sid = CreateSessionId();
-                    DateTime now = DateTime.Now;
-
-                    c_sessions.InsertOneAsync(new UserSession { username = body.username, session_id = sid, user_id = d._id, created = now });
-                    found = true;
-                }
-            }
-            if (found == false)
-            {
-                return "missing or wrong password";
-            }
-            else
-            {
-
-                return sid;
-            }
-
-        }
-        [HttpPatch]
-        public string Patch([FromBody] User body)
-        {
-            return UserPassword.HashPassword(body.password);
+            return "Success";
 
         }
         [HttpDelete]
         public string Delete([FromBody] User body)
         {
-
-            if (CheckSessionId() != false)
-            {
-                var session_id = Request.Headers["Authorization"];
-                c_sessions.DeleteOne(a => a.session_id == session_id);
-                return "true";
-            }
-            else
-            {
-                return "false";
-            };
+            return "Success";
         }
         public string Default()
         {
             return "Method Not Found";
-        }
-        string CreateSessionId()
-        {
-
-            Guid guid = Guid.NewGuid();
-            string str = guid.ToString();
-            return str;
         }
 
         bool CheckSessionId()
@@ -154,7 +97,7 @@ namespace November.Dotnet.Controllers
             }
         }
 
-        Object Profile()
+        UserProfile Profile()
         {
             var session_id = Request.Headers["Authorization"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();

@@ -31,4 +31,10 @@ namespace November.Dotnet
         }
     }
 
+    public class UserPut
+    {
+        public string email { get; set; }
+        public string url { get; set; }
+    }
+
 }

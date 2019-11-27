@@ -9,4 +9,14 @@ namespace November.Dotnet
         public static string host = "[host]";
         public static string salt = "[salt]";
     }
+    public class ConfigSendGridExample
+    {
+        public static string sendGridApi = "[sendgrid_apikey]";
+
+    }
+    public class ConfigAtlasExample
+    {
+        public static string client_id = "atlas_clientid";
+
+    }
 }

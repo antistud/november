@@ -13,4 +13,13 @@ namespace November.Dotnet
         public bool favorite { get; set; }
 
     }
+    public class UserGamePost
+    {
+        public string _id { get; set; }
+        public string user_id { get; set; }
+        public string atlas_id { get; set; }
+        public string bgg_id { get; set; }
+        public bool favorite { get; set; }
+
+    }
 }
