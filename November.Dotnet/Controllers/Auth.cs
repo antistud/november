@@ -105,7 +105,7 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpDelete]
-        public string Delete([FromBody] User body)
+        public string Delete()
         {
 
             if (CheckSessionId() != false)

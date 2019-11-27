@@ -52,3 +52,8 @@ C:/Users/jon/Documents/projects/november/November.Dotnet/obj/Debug/netcoreapp3.0
 C:/Users/jon/Documents/projects/november/November.Dotnet/obj/Debug/netcoreapp3.0/November.Dotnet.csproj.CopyComplete
 C:/Users/jon/Documents/projects/november/November.Dotnet/obj/Debug/netcoreapp3.0/November.Dotnet.dll
 C:/Users/jon/Documents/projects/november/November.Dotnet/obj/Debug/netcoreapp3.0/November.Dotnet.pdb
+/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/out/web.config
+/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/out/appsettings.Development.json
+/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/out/appsettings.json
+/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/out/November.Dotnet.deps.json
+/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/bin/Debug/netcoreapp3.0/out/November.Dotnet.runtimeconfig.json
