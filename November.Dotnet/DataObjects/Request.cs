@@ -15,4 +15,23 @@ namespace November.Dotnet
         public int requester_rating { get; set; }
         public int lender_rating { get; set; }
     }
+    public class GameRequestPut
+    {
+        public string _id { get; set; }
+        public string user_id { get; set; }
+        public string game_id { get; set; }
+        public bool send_sent { get; set; }
+        public bool send_recieved { get; set; }
+        public bool return_sent { get; set; }
+        public bool return_recieved { get; set; }
+        public int requester_rating { get; set; }
+        public int lender_rating { get; set; }
+    }
+    public class GameRequestPost
+    {
+        public string _id { get; set; }
+        public string step { get; set; }
+        public int requester_rating { get; set; }
+        public int lender_rating { get; set; }
+    }
 }

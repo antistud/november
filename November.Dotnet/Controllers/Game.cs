@@ -29,7 +29,6 @@ namespace November.Dotnet.Controllers
         public EmailAddress sg_from;
         public IMongoCollection<UserGame> c_game;
         public IMongoCollection<GamePlay> c_play;
-
         public IMongoCollection<GameRequest> c_request;
         public GameController()
         {

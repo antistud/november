@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
@@ -27,6 +28,8 @@ namespace November.Dotnet.Controllers
         public SendGridClient sg_client;
         public EmailAddress sg_from;
         public IMongoCollection<UserGame> c_game;
+        public IMongoCollection<GamePlay> c_play;
+        public IMongoCollection<GameRequest> c_request;
 
 
         public RequestController()
@@ -39,12 +42,15 @@ namespace November.Dotnet.Controllers
             c_auth = db.GetCollection<User>("user");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
-            c_game = db.GetCollection<UserGame>("request");
+            c_game = db.GetCollection<UserGame>("game");
+            c_play = db.GetCollection<GamePlay>("play");
+            c_request = db.GetCollection<GameRequest>("request");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
             sg_client = new SendGridClient(sg_apiKey);
             sg_from = new EmailAddress("jon@t3ch.net", "Example User");
+
         }
         [HttpGet]
         public string Get()
@@ -52,10 +58,18 @@ namespace November.Dotnet.Controllers
 
             if (CheckSessionId() != false)
             {
-
                 var profile = Profile();
-                var docs = c_game.Find(x => x.user_id == profile.user_id).ToList().First();
-                return "hello";
+                try
+                {
+                    var docs = c_request.Find(x => x.user_id == profile.user_id).ToList();
+                    var json = JsonConvert.SerializeObject(docs);
+                    return json;
+                }
+                catch
+                {
+                    return "no requests";
+                }
+
             }
             else
             {
@@ -64,20 +78,82 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpPut]
-        public string Put([FromQuery] string email, [FromBody] string url)
+        public string Put([FromBody] GameRequestPut body)
         {
-            return "Success";
+            if (CheckSessionId() != false)
+            {
+                var profile = Profile();
+
+                var id = ObjectId.GenerateNewId();
+                var gameId = ObjectId.Parse(body.game_id);
+                c_request.InsertOneAsync(new GameRequest { _id = id, game_id = gameId, user_id = profile.user_id });
+                return id.ToString();
+
+            }
+            else
+            {
+                return "false";
+            }
         }
+        [Route("{requestId}")]
         [HttpPost]
-        public string Post([FromBody] User body)
+        public string Post([FromBody] GameRequestPost body, string requestId)
         {
-            return "Success";
+            var profile = Profile();
+            DateTime now = DateTime.Now;
+            var id = ObjectId.Parse(requestId);
+            var filter = Builders<GameRequest>.Filter.Eq(x => x._id, id);
+            // Favorite
+            if (body.step == "send_sent")
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.send_sent, now);
+                c_request.UpdateOneAsync(filter, update);
+            }
+            // 
+            if (body.step == "send_recieved")
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.send_recieved, now);
+                c_request.UpdateOneAsync(filter, update);
+            }
+
+            if (body.step == "return_recieved")
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.return_recieved, now);
+                c_request.UpdateOneAsync(filter, update);
+            }
+            if (body.step == "return_sent")
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.return_sent, now);
+                c_request.UpdateOneAsync(filter, update);
+            }
+            if (body.requester_rating != 0)
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.requester_rating, body.requester_rating);
+                c_request.UpdateOneAsync(filter, update);
+            }
+            if (body.lender_rating != 0)
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.lender_rating, body.lender_rating);
+                c_request.UpdateOneAsync(filter, update);
+            }
+
+            return "success";
+
 
         }
         [HttpDelete]
-        public string Delete([FromBody] User body)
+        public string Delete([FromBody] GameRequestPut body)
         {
-            return "Success";
+            var id = ObjectId.Parse(body._id);
+            if (CheckSessionId() != false)
+            {
+                c_request.DeleteOne(a => a._id == id);
+                return "true";
+            }
+            else
+            {
+                return "false";
+            };
         }
         public string Default()
         {

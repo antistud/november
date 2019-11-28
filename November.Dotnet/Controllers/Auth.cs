@@ -59,15 +59,39 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpPut]
-        public string Put([FromBody] UserPut body)
+        public string Put([FromBody] User body)
         {
-            var sg_subject = "This is going to be Fun!!!";
-            var sg_to = new EmailAddress(body.email);
-            var sg_plainTextContent = "You have requested to be a part of something special.  All you have to do now is click the link " + body.url;
-            var sg_htmlContent = $"<strong>You have requested to be a part of something special.</strong><br>All you have to do now is click the link<br><br><a href='{body.url}'>Go</a>";
-            var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
-            var sg_response = sg_client.SendEmailAsync(sg_msg);
-            return "success";
+            // var sg_subject = "This is going to be Fun!!!";
+            // var sg_to = new EmailAddress(body.email);
+            // var sg_plainTextContent = "You have requested to be a part of something special.  All you have to do now is click the link " + body.url;
+            // var sg_htmlContent = $"<strong>You have requested to be a part of something special.</strong><br>All you have to do now is click the link<br><br><a href='{body.url}'>Go</a>";
+            // var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
+            // var sg_response = sg_client.SendEmailAsync(sg_msg);
+            try
+            {
+                c_auth.Find(x => x.username == body.username).ToList().First();
+                return "user already exists";
+            }
+            catch
+            {
+                return "success";
+            }
+        }
+        [HttpPut]
+        [Route("Reset")]
+        public string PutReset([FromBody] User body)
+        {
+            try
+            {
+                c_auth.Find(x => x.username == body.username).ToList().First();
+                return "user already exists";
+            }
+            catch
+            {
+                c_auth.InsertOneAsync(new User { username = body.username });
+                return "success";
+            }
+
         }
         [HttpPost]
         public string Post([FromBody] User body)

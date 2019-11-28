@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
@@ -27,7 +28,8 @@ namespace November.Dotnet.Controllers
         public SendGridClient sg_client;
         public EmailAddress sg_from;
         public IMongoCollection<UserGame> c_game;
-
+        public IMongoCollection<GamePlay> c_play;
+        public IMongoCollection<GameRequest> c_request;
 
         public PlayController()
         {
@@ -39,7 +41,9 @@ namespace November.Dotnet.Controllers
             c_auth = db.GetCollection<User>("user");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
-            c_game = db.GetCollection<UserGame>("play");
+            c_game = db.GetCollection<UserGame>("game");
+            c_play = db.GetCollection<GamePlay>("play");
+            c_request = db.GetCollection<GameRequest>("request");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
@@ -47,16 +51,51 @@ namespace November.Dotnet.Controllers
             sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
         [HttpGet]
-        public string Get([FromQuery] GamePlay body)
+        public string Get()
         {
+            if (CheckSessionId() != false)
+            {
+                var profile = Profile();
+                try
+                {
+                    var docs = c_play.Find(x => x.user_id == profile.user_id).ToList();
+                    var json = JsonConvert.SerializeObject(docs);
+                    return json;
+                }
+                catch
+                {
+                    return "no plays";
+                }
 
-            return "Comeing Soon";
+            }
+            else
+            {
+                return "false";
+            };
 
         }
         [HttpPut]
-        public string Put([FromQuery] string email, [FromBody] string url)
+        public string Put([FromBody] GamePlayPut body)
         {
-            return "Success";
+            if (CheckSessionId() != false)
+            {
+                var profile = Profile();
+                try
+                {
+                    var id = ObjectId.GenerateNewId();
+                    var gameId = ObjectId.Parse(body.game_id);
+                    c_play.InsertOneAsync(new GamePlay { _id = id, story = body.story, rating = body.rating, length = body.length, user_id = profile.user_id, game_id = gameId });
+                    return id.ToString();
+                }
+                catch
+                {
+                    return "failed";
+                }
+            }
+            else
+            {
+                return "false";
+            }
         }
         [HttpPost]
         public string Post([FromBody] User body)
@@ -65,9 +104,18 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpDelete]
-        public string Delete([FromBody] User body)
+        public string Delete([FromBody] UserGamePost body)
         {
-            return "Success";
+            var id = ObjectId.Parse(body._id);
+            if (CheckSessionId() != false)
+            {
+                c_play.DeleteOne(a => a._id == id);
+                return "true";
+            }
+            else
+            {
+                return "false";
+            };
         }
         public string Default()
         {
