@@ -59,23 +59,30 @@ namespace November.Dotnet.Controllers
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
-
-                var games = c_game.Find(x => x.user_id == profile.user_id).ToList();
-                List<GameRequest> ls = new List<GameRequest>();
-                foreach (var game in games)
+                try
                 {
-                    var requests = c_request.Find(x => x.game_id == game._id).ToList();
-                    foreach (var r in requests)
-                    {
-                        ls.Add(r);
-                        Console.WriteLine('i');
-                    }
-                    var json = JsonConvert.SerializeObject(requests);
+                    // var docs = c_request.Find(x => x.user_id == profile.user_id).ToList();
+
+                    // var games = c_game.Find(x => x.user_id == profile.user_id).ToList();
+                    // List<GameRequest> gamesls = new List<GameRequest>();
+
+                    // ls.Add(new GameRequestReturn() { mine = docs, others = games });
+                    // var json = JsonConvert.SerializeObject(ls);
+
+                    var query = from request in c_request.AsQueryable()
+                                join game in c_game.AsQueryable() on
+                                request.game_id equals game._id into game
+                                select new { request, game };
+
+                    Console.WriteLine(query);
+                    var r = query.ToList();
+                    var json = JsonConvert.SerializeObject(r);
                     return json;
-
                 }
-
-                return JsonConvert.SerializeObject(games);
+                catch
+                {
+                    return "no requests";
+                }
 
             }
             else

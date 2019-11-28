@@ -38,10 +38,7 @@ namespace November.Dotnet
     {
         public Object others { get; set; }
         public Object mine { get; set; }
-        public GameRequestReturn()
-        {
 
-        }
     }
 
 }
