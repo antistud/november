@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
@@ -22,6 +23,7 @@ namespace November.Dotnet.Controllers
         public IMongoCollection<User> c_auth;
         public IMongoCollection<UserSession> c_sessions;
         public IMongoCollection<UserProfile> c_profile;
+        public IMongoCollection<UserFriend> c_friend;
         public string sg_apiKey;
         public SendGridClient sg_client;
         public EmailAddress sg_from;
@@ -37,6 +39,8 @@ namespace November.Dotnet.Controllers
             c_auth = db.GetCollection<User>("user");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
+
+            c_friend = db.GetCollection<UserFriend>("friend");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
@@ -56,6 +60,42 @@ namespace November.Dotnet.Controllers
             {
                 return "false";
             };
+
+        }
+
+        [Route("Friends")]
+        [HttpGet]
+        public string GetFriends()
+        {
+            if (CheckSessionId() != false)
+            {
+                var profile = Profile();
+                var docs = c_friend.Find(x => x.user_id == profile.user_id).ToList();
+                return JsonConvert.SerializeObject(docs);
+            }
+            else
+            {
+                return "false";
+            };
+
+        }
+        [Route("Friend/{id}")]
+        [HttpPut]
+        public string Put(string id)
+        {
+            var profile = Profile();
+            var friendId = ObjectId.Parse(id);
+            try
+            {
+                var docs = c_friend.Find(x => x.user_id == profile.user_id && x.friend_id == friendId).ToList().First();
+                return "Friend Already Added";
+            }
+            catch
+            {
+                var newid = ObjectId.GenerateNewId();
+                c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = friendId, user_id = profile.user_id });
+                return id.ToString();
+            }
 
         }
 
@@ -103,7 +143,7 @@ namespace November.Dotnet.Controllers
                     c_profile.UpdateOneAsync(filter, update);
                 }
             }
-            return "none";
+            return "Success";
 
         }
         [HttpDelete]

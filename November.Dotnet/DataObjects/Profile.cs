@@ -16,6 +16,5 @@ namespace November.Dotnet
         public string city { get; set; }
         public string state { get; set; }
         public string zip { get; set; }
-        public Array friends { get; set; }
     }
 }
