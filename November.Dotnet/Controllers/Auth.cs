@@ -178,7 +178,7 @@ namespace November.Dotnet.Controllers
             }
         }
 
-        Object Profile()
+        UserProfile Profile()
         {
             var session_id = Request.Headers["Authorization"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();

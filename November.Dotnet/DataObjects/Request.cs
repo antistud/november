@@ -34,4 +34,14 @@ namespace November.Dotnet
         public int requester_rating { get; set; }
         public int lender_rating { get; set; }
     }
+    public class GameRequestReturn
+    {
+        public Object others { get; set; }
+        public Object mine { get; set; }
+        public GameRequestReturn()
+        {
+
+        }
+    }
+
 }
