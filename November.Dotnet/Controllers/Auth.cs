@@ -82,6 +82,12 @@ namespace November.Dotnet.Controllers
                     var id = ObjectId.GenerateNewId();
                     var password = randompassword();
                     c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
+                    var sg_subject = "This is going to be Fun!!!";
+                    var sg_to = new EmailAddress(body.email);
+                    var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email + " password: " + password;
+                    var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email + "<br>password: " + password + "";
+                    var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
+                    var sg_response = sg_client.SendEmailAsync(sg_msg);
                     return password;
                 }
             }
