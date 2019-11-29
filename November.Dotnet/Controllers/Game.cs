@@ -30,6 +30,7 @@ namespace November.Dotnet.Controllers
         public IMongoCollection<UserGame> c_game;
         public IMongoCollection<GamePlay> c_play;
         public IMongoCollection<GameRequest> c_request;
+        public IMongoCollection<UserFriend> c_friend;
         public GameController()
         {
             var dbUser = ConfigDb.username;
@@ -43,6 +44,7 @@ namespace November.Dotnet.Controllers
             c_game = db.GetCollection<UserGame>("game");
             c_play = db.GetCollection<GamePlay>("play");
             c_request = db.GetCollection<GameRequest>("request");
+            c_friend = db.GetCollection<UserFriend>("friend");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
@@ -83,6 +85,32 @@ namespace November.Dotnet.Controllers
                 return "false";
             };
 
+        }
+        [Route("Friends")]
+        [HttpGet]
+        public string GetFriendGames()
+        {
+            var profile = Profile();
+            var query = from friend in c_friend.AsQueryable()
+                        join game in c_game.AsQueryable() on
+                        friend.friend_id equals game.user_id into game
+                        select new { friend, game };
+
+            List<UserGame> gamesls = new List<UserGame>();
+            foreach (var q in query)
+            {
+                if (q.friend.user_id == profile.user_id)
+                {
+                    foreach (var g in q.game)
+                    {
+                        gamesls.Add(g);
+                    }
+
+                }
+            }
+
+            var json = JsonConvert.SerializeObject(gamesls);
+            return json;
         }
         [Route("{gameId}")]
         [HttpGet]
