@@ -6,7 +6,7 @@ Repo = GitHub
 
 Frontend = React 
 
-Backend = .Net
+Backend = .Net Core
 
 Database = MongoDB
 
