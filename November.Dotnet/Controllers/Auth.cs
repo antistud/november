@@ -43,7 +43,7 @@ namespace November.Dotnet.Controllers
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
             sg_client = new SendGridClient(sg_apiKey);
-            sg_from = new EmailAddress("jon@t3ch.net", "Example User");
+            sg_from = new EmailAddress("noreply@garishgames.com", "Garish Games");
         }
         [HttpGet]
         public string Get()
@@ -88,7 +88,8 @@ namespace November.Dotnet.Controllers
                     var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email + "<br>password: " + password + "";
                     var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
                     var sg_response = sg_client.SendEmailAsync(sg_msg);
-                    return password;
+                    sg_response.ToJson();
+                    return "success";
                 }
             }
             else
