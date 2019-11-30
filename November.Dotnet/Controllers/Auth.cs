@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
@@ -41,7 +43,7 @@ namespace November.Dotnet.Controllers
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;
             sg_client = new SendGridClient(sg_apiKey);
-            sg_from = new EmailAddress("jon@t3ch.net", "Example User");
+            sg_from = new EmailAddress("noreply@garishgames.com", "Garish Games");
         }
         [HttpGet]
         public string Get()
@@ -59,7 +61,7 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpPut]
-        public string Put([FromBody] User body)
+        public string Put([FromBody] UserPut body)
         {
             // var sg_subject = "This is going to be Fun!!!";
             // var sg_to = new EmailAddress(body.email);
@@ -67,15 +69,34 @@ namespace November.Dotnet.Controllers
             // var sg_htmlContent = $"<strong>You have requested to be a part of something special.</strong><br>All you have to do now is click the link<br><br><a href='{body.url}'>Go</a>";
             // var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
             // var sg_response = sg_client.SendEmailAsync(sg_msg);
-            try
+            if (CheckSessionId() != false)
             {
-                c_auth.Find(x => x.username == body.username).ToList().First();
-                return "user already exists";
+
+                try
+                {
+                    var docs = c_auth.Find(x => x.username == body.email).ToList().First();
+                    return "User Already Added";
+                }
+                catch
+                {
+                    var id = ObjectId.GenerateNewId();
+                    var password = randompassword();
+                    c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
+                    var sg_subject = "This is going to be Fun!!!";
+                    var sg_to = new EmailAddress(body.email);
+                    var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email + " password: " + password;
+                    var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email + "<br>password: " + password + "";
+                    var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
+                    var sg_response = sg_client.SendEmailAsync(sg_msg);
+                    sg_response.ToJson();
+                    return "success";
+                }
             }
-            catch
+            else
             {
-                return "success";
+                return "You must be logged in to create a user";
             }
+
         }
         [HttpPut]
         [Route("Reset")]
@@ -185,6 +206,21 @@ namespace November.Dotnet.Controllers
             var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
             return profile;
+        }
+
+        string randompassword()
+        {
+            return Slice(Regex.Replace(Convert.ToBase64String(Guid.NewGuid().ToByteArray()), "[/+=]", ""), 0, 8);
+
+        }
+        string Slice(string source, int start, int end)
+        {
+            if (end < 0) // Keep this for negative end support
+            {
+                end = source.Length + end;
+            }
+            int len = end - start;               // Calculate length
+            return source.Substring(start, len); // Return Substring of length
         }
     }
 }
