@@ -35,7 +35,6 @@ namespace November.Dotnet
             app.UseCors(x => x
                       .WithOrigins("*")
                       .AllowAnyMethod()
-                      .AllowCredentials()
                       .AllowAnyHeader());
             if (env.IsDevelopment())
             {
