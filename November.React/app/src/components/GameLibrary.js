@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Table } from "react-bootstrap";
 import { Image } from "react-bootstrap";
+import "../App.css"
 export class GameLibrary extends Component {
   renderTableData() {
     return this.props.gamelibrary.map(game => (
