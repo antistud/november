@@ -53,9 +53,11 @@ namespace November.Dotnet.Controllers
 
         }
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
 
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
@@ -92,42 +94,45 @@ namespace November.Dotnet.Controllers
 
                     }
                 }
-                var json = JsonConvert.SerializeObject(gamesls);
-                return json;
+                return Ok(gamesls);
 
 
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
 
         }
         [HttpPut]
-        public string Put([FromBody] GameRequestPut body)
+        public IActionResult Put([FromBody] GameRequestPut body)
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
 
-                var id = ObjectId.GenerateNewId();
-                var gameId = ObjectId.Parse(body.game_id);
+                var id = ObjectId.GenerateNewId().ToString();
+                var gameId = ObjectId.Parse(body.game_id).ToString();
                 c_request.InsertOneAsync(new GameRequest { _id = id, game_id = gameId, user_id = profile.user_id });
-                return id.ToString();
+                return Ok(id.ToString());
 
             }
             else
             {
-                return "false";
+                return Ok("false");
             }
         }
         [Route("{requestId}")]
         [HttpPost]
-        public string Post([FromBody] GameRequestPost body, string requestId)
+        public IActionResult Post([FromBody] GameRequestPost body, string requestId)
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
             DateTime now = DateTime.Now;
-            var id = ObjectId.Parse(requestId);
+            var id = ObjectId.Parse(requestId).ToString();
             var filter = Builders<GameRequest>.Filter.Eq(x => x._id, id);
             // Favorite
             if (body.step == "send_sent")
@@ -163,32 +168,36 @@ namespace November.Dotnet.Controllers
                 c_request.UpdateOneAsync(filter, update);
             }
 
-            return "success";
+            return Ok("success");
 
 
         }
         [HttpDelete]
-        public string Delete([FromBody] GameRequestPut body)
+        public IActionResult Delete([FromBody] GameRequestPut body)
         {
-            var id = ObjectId.Parse(body._id);
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
             {
                 c_request.DeleteOne(a => a._id == id);
-                return "true";
+                return Ok("true");
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
         }
-        public string Default()
+        public IActionResult Default()
         {
-            return "Method Not Found";
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            return Ok("Method Not Found");
         }
 
         bool CheckSessionId()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
@@ -211,7 +220,7 @@ namespace November.Dotnet.Controllers
 
         UserProfile Profile()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
             var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 

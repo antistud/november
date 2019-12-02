@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using Newtonsoft.Json;
@@ -46,40 +47,38 @@ namespace November.Dotnet.Controllers
             sg_from = new EmailAddress("noreply@garishgames.com", "Garish Games");
         }
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
-
-
-                return JsonConvert.SerializeObject(Profile());
+                return Ok(Profile());
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
 
         }
         [HttpPut]
-        public string Put([FromBody] UserPut body)
+        public IActionResult Put([FromBody] UserPut body)
         {
-            // var sg_subject = "This is going to be Fun!!!";
-            // var sg_to = new EmailAddress(body.email);
-            // var sg_plainTextContent = "You have requested to be a part of something special.  All you have to do now is click the link " + body.url;
-            // var sg_htmlContent = $"<strong>You have requested to be a part of something special.</strong><br>All you have to do now is click the link<br><br><a href='{body.url}'>Go</a>";
-            // var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
-            // var sg_response = sg_client.SendEmailAsync(sg_msg);
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
 
                 try
                 {
                     var docs = c_auth.Find(x => x.username == body.email).ToList().First();
-                    return "User Already Added";
+                    return Ok("User Already Added");
                 }
                 catch
                 {
-                    var id = ObjectId.GenerateNewId();
+                    var id = ObjectId.GenerateNewId().ToString();
                     var password = randompassword();
                     c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
                     var sg_subject = "This is going to be Fun!!!";
@@ -89,33 +88,36 @@ namespace November.Dotnet.Controllers
                     var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
                     var sg_response = sg_client.SendEmailAsync(sg_msg);
                     sg_response.ToJson();
-                    return "success";
+                    return Ok("success");
                 }
             }
             else
             {
-                return "You must be logged in to create a user";
+                return Ok("You must be logged in to create a user");
             }
 
         }
         [HttpPut]
         [Route("Reset")]
-        public string PutReset([FromBody] User body)
+        public IActionResult PutReset([FromBody] User body)
         {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             try
             {
                 c_auth.Find(x => x.username == body.username).ToList().First();
-                return "user already exists";
+                return Ok("user already exists");
             }
             catch
             {
                 c_auth.InsertOneAsync(new User { username = body.username });
-                return "success";
+                return Ok("success");
             }
 
         }
         [HttpPost]
-        public string Post([FromBody] User body)
+        public IActionResult Post([FromBody] User body)
         {
             var docs = c_auth.Find(x => x.username == body.username).ToList();
             var sid = "";
@@ -134,39 +136,45 @@ namespace November.Dotnet.Controllers
             }
             if (found == false)
             {
-                return "missing or wrong password";
+                return Ok("missing or wrong password");
             }
             else
             {
 
-                return sid;
+                return Ok(sid);
             }
 
         }
         [HttpPatch]
-        public string Patch([FromBody] User body)
+        public IActionResult Patch([FromBody] User body)
         {
-            return UserPassword.HashPassword(body.password);
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            return Ok(UserPassword.HashPassword(body.password));
 
         }
         [HttpDelete]
-        public string Delete()
+        public IActionResult Delete()
         {
 
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
-                var session_id = Request.Headers["Authorization"];
+                var session_id = Request.Headers["token"];
                 c_sessions.DeleteOne(a => a.session_id == session_id);
-                return "true";
+                return Ok("true");
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
         }
-        public string Default()
+        public IActionResult Default()
         {
-            return "Method Not Found";
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            return Ok("Method Not Found");
         }
         string CreateSessionId()
         {
@@ -178,7 +186,7 @@ namespace November.Dotnet.Controllers
 
         bool CheckSessionId()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
@@ -201,7 +209,7 @@ namespace November.Dotnet.Controllers
 
         UserProfile Profile()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
             var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 

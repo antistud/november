@@ -48,60 +48,68 @@ namespace November.Dotnet.Controllers
             sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
 
 
-                return JsonConvert.SerializeObject(Profile());
+                return Ok(Profile());
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
 
         }
 
         [Route("Friends")]
         [HttpGet]
-        public string GetFriends()
+        public IActionResult GetFriends()
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
                 var docs = c_friend.Find(x => x.user_id == profile.user_id).ToList();
-                return JsonConvert.SerializeObject(docs);
+                return Ok(docs);
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
 
         }
         [Route("Friend/{id}")]
         [HttpPut]
-        public string Put(string id)
+        public IActionResult Put(string id)
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
-            var friendId = ObjectId.Parse(id);
+            var friendId = ObjectId.Parse(id).ToString();
             try
             {
                 var docs = c_friend.Find(x => x.user_id == profile.user_id && x.friend_id == friendId).ToList().First();
-                return "Friend Already Added";
+                return Ok("Friend Already Added");
             }
             catch
             {
-                var newid = ObjectId.GenerateNewId();
+                var newid = ObjectId.GenerateNewId().ToString();
                 c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = friendId, user_id = profile.user_id });
-                return id.ToString();
+                return Ok(id.ToString());
             }
 
         }
 
         [HttpPost]
-        public string Post([FromBody] UserProfile body)
+        public IActionResult Post([FromBody] UserProfile body)
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
@@ -143,24 +151,28 @@ namespace November.Dotnet.Controllers
                     c_profile.UpdateOneAsync(filter, update);
                 }
             }
-            return "Success";
+            return Ok("Success");
 
         }
         [HttpDelete]
-        public string Patch([FromBody] User body)
+        public IActionResult Patch([FromBody] User body)
         {
-            return "none";
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            return Ok("none");
 
         }
 
-        public string Default()
+        public IActionResult Default()
         {
-            return "Method Not Found";
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            return Ok("Method Not Found");
         }
 
         bool CheckSessionId()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
@@ -183,7 +195,7 @@ namespace November.Dotnet.Controllers
 
         UserProfile Profile()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
             var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 

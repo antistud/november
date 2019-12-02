@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
@@ -16,6 +17,7 @@ using SendGrid.Helpers.Mail;
 namespace November.Dotnet.Controllers
 {
     [ApiController]
+    [EnableCors("AllowAllOrigins")]
     [Route("Game")]
     public class GameController : ControllerBase
     {
@@ -33,6 +35,7 @@ namespace November.Dotnet.Controllers
         public IMongoCollection<UserFriend> c_friend;
         public GameController()
         {
+
             var dbUser = ConfigDb.username;
             var password = ConfigDb.password;
             var host = ConfigDb.host;
@@ -53,9 +56,11 @@ namespace November.Dotnet.Controllers
         }
 
         [HttpGet]
-        public string Get()
+        public IActionResult Get()
         {
 
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
 
@@ -64,32 +69,26 @@ namespace November.Dotnet.Controllers
                 {
                     var docs = c_game.Find(x => x.user_id == profile.user_id).ToList();
                     var json = JsonConvert.SerializeObject(docs);
-                    // var games = "";
-                    // foreach (var d in docs)
-                    // {
-                    //     games = d.atlas_id + ",";
-                    // }
-                    // var games = json.Replace("\"", "").Replace("[", "").Replace("]", "");
-                    // var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=PaLV4upJP7&ids=" + games);
-
-                    return json;
+                    return Ok(docs);
                 }
                 catch
                 {
-                    return "no games";
+                    return Ok("No Games");
                 }
 
             }
             else
             {
-                return "false";
+                return Ok("fail");
             };
 
         }
         [Route("Friends")]
         [HttpGet]
-        public string GetFriendGames()
+        public IActionResult GetFriendGames()
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
             var query = from friend in c_friend.AsQueryable()
                         join game in c_game.AsQueryable() on
@@ -109,14 +108,16 @@ namespace November.Dotnet.Controllers
                 }
             }
 
-            var json = JsonConvert.SerializeObject(gamesls);
-            return json;
+            return Ok(gamesls);
         }
         [Route("{gameId}")]
         [HttpGet]
-        public string GetId(string gameId, [FromQuery] bool atlas, [FromQuery] bool play, [FromQuery] bool request)
+        public IActionResult GetId(string gameId, [FromQuery] bool atlas, [FromQuery] bool play, [FromQuery] bool request)
         {
-            var game_id = ObjectId.Parse(gameId);
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            var game_id = ObjectId.Parse(gameId).ToString();
             if (CheckSessionId() != false)
             {
 
@@ -158,45 +159,50 @@ namespace November.Dotnet.Controllers
 
                         }
                     }
-                    var json = JsonConvert.SerializeObject(docs);
-                    return json;
+                    return Ok(docs);
                 }
                 catch
                 {
-                    return "no games";
+                    return Ok("no games");
                 }
 
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
         }
         [HttpPut]
-        public string Put([FromBody] UserGame body)
+        public IActionResult Put([FromBody] UserGame body)
         {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
 
             try
             {
                 var docs = c_game.Find(x => x.user_id == profile.user_id && x.atlas_id == body.atlas_id).ToList().First();
-                return "Game Already Added";
+                return Ok("Game Already Added");
             }
             catch
             {
-                var id = ObjectId.GenerateNewId();
+                var id = ObjectId.GenerateNewId().ToString();
                 c_game.InsertOneAsync(new UserGame { _id = id, atlas_id = body.atlas_id, user_id = profile.user_id });
-                return id.ToString();
+                return Ok(id.ToString());
             }
 
 
         }
         [HttpPost]
-        public string Post([FromBody] UserGamePost body)
+        public IActionResult Post([FromBody] UserGamePost body)
         {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
 
-            var id = ObjectId.Parse(body._id);
+            var id = ObjectId.Parse(body._id).ToString();
             var filter = Builders<UserGame>.Filter.Eq(x => x._id, id);
             // Favorite
             if (body.favorite == true)
@@ -218,33 +224,39 @@ namespace November.Dotnet.Controllers
             }
 
 
-            return "success";
+            return Ok("success");
 
 
 
         }
         [HttpDelete]
-        public string Delete([FromBody] UserGamePost body)
+        public IActionResult Delete([FromBody] UserGamePost body)
         {
-            var id = ObjectId.Parse(body._id);
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
             {
                 c_game.DeleteOne(a => a._id == id);
-                return "true";
+                return Ok("true");
             }
             else
             {
-                return "false";
+                return Ok("false");
             };
         }
-        public string Default()
+        public IActionResult Default()
         {
-            return "Method Not Found";
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            return Ok("Method Not Found");
         }
 
         bool CheckSessionId()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
@@ -267,10 +279,9 @@ namespace November.Dotnet.Controllers
 
         UserProfile Profile()
         {
-            var session_id = Request.Headers["Authorization"].ToString();
+            var session_id = Request.Headers["token"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
             var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
-
             return profile;
         }
     }

@@ -1,13 +1,18 @@
 using System;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace November.Dotnet
 {
     public class GameRequest
     {
-        public ObjectId _id { get; set; }
-        public ObjectId user_id { get; set; }
-        public ObjectId game_id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string _id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string user_id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string game_id { get; set; }
         public DateTime send_sent { get; set; }
         public DateTime send_recieved { get; set; }
         public DateTime return_sent { get; set; }
