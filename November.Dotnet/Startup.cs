@@ -53,7 +53,7 @@ namespace November.Dotnet
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors("AllowAllOrigins");
+            app.UseCors();
 
             app.UseHttpsRedirection();
 
