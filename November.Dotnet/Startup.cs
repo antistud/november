@@ -16,16 +16,7 @@ namespace November.Dotnet
 {
     public class Startup
     {
-        public CorsPolicy GenerateCorsPolicy()
-        {
-            var corsBuilder = new CorsPolicyBuilder();
-            corsBuilder.AllowAnyHeader();
-            corsBuilder.AllowAnyMethod();
-            corsBuilder.AllowAnyOrigin(); // For anyone access.
-            // corsBuilder.WithOrigins("http://localhost:3000"); // for a specific url. Don't add a forward slash on the end!
-            // corsBuilder.AllowCredentials();
-            return corsBuilder.Build();
-        }
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -36,11 +27,9 @@ namespace November.Dotnet
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCors(options =>
-                     {
-                         options.AddPolicy("AllowAllOrigins", GenerateCorsPolicy());
-                     });
+
             services.AddControllers();
+            services.AddCors();
 
         }
 
@@ -53,14 +42,12 @@ namespace November.Dotnet
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(builder => builder
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
-
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseCors(
+               options => options.SetIsOriginAllowed(x => _ = true).AllowAnyMethod().AllowAnyHeader().AllowCredentials()
+           );
 
             app.UseAuthorization();
 
