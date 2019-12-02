@@ -197,7 +197,7 @@ namespace November.Dotnet.Controllers
 
         bool CheckSessionId()
         {
-            var session_id = Request.Headers["token"].ToString();
+            var session_id = Request.Headers["Authorization"].ToString();
             var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
@@ -220,7 +220,7 @@ namespace November.Dotnet.Controllers
 
         UserProfile Profile()
         {
-            var session_id = Request.Headers["token"].ToString();
+            var session_id = Request.Headers["Authorization"].ToString();
             var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
             var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
