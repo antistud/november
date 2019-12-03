@@ -84,6 +84,84 @@ namespace November.Dotnet.Controllers
             };
 
         }
+        [HttpPut]
+        public IActionResult Put([FromBody] UserGame body)
+        {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            var profile = Profile();
+
+            try
+            {
+                var docs = c_game.Find(x => x.user_id == profile.user_id && x.atlas_id == body.atlas_id).ToList().First();
+                return Ok("Game Already Added");
+            }
+            catch
+            {
+                var id = ObjectId.GenerateNewId().ToString();
+                c_game.InsertOneAsync(new UserGame { _id = id, atlas_id = body.atlas_id, user_id = profile.user_id });
+                return Ok(id.ToString());
+            }
+
+
+        }
+        [HttpPost]
+        public IActionResult Post([FromBody] UserGamePost body)
+        {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            var profile = Profile();
+
+            var id = ObjectId.Parse(body._id).ToString();
+            var filter = Builders<UserGame>.Filter.Eq(x => x._id, id);
+            // Favorite
+            if (body.favorite == true)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
+                c_game.UpdateOneAsync(filter, update);
+            }
+            // 
+            if (body.atlas_id != null)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
+                c_game.UpdateOneAsync(filter, update);
+            }
+
+            if (body.bgg_id != null)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
+                c_game.UpdateOneAsync(filter, update);
+            }
+
+
+            return Ok("success");
+
+
+
+        }
+        [HttpDelete]
+        public IActionResult Delete([FromBody] UserGamePost body)
+        {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            var id = ObjectId.Parse(body._id).ToString();
+            if (CheckSessionId() != false)
+            {
+                c_game.DeleteOne(a => a._id == id);
+                return Ok("true");
+            }
+            else
+            {
+                return Ok("false");
+            };
+        }
+
         [Route("Friends")]
         [HttpGet]
         public IActionResult GetFriendGames()
@@ -169,83 +247,6 @@ namespace November.Dotnet.Controllers
                     return Ok("no games");
                 }
 
-            }
-            else
-            {
-                return Ok("false");
-            };
-        }
-        [HttpPut]
-        public IActionResult Put([FromBody] UserGame body)
-        {
-
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            Response.Headers.Add("Content-Type", "application/json");
-            var profile = Profile();
-
-            try
-            {
-                var docs = c_game.Find(x => x.user_id == profile.user_id && x.atlas_id == body.atlas_id).ToList().First();
-                return Ok("Game Already Added");
-            }
-            catch
-            {
-                var id = ObjectId.GenerateNewId().ToString();
-                c_game.InsertOneAsync(new UserGame { _id = id, atlas_id = body.atlas_id, user_id = profile.user_id });
-                return Ok(id.ToString());
-            }
-
-
-        }
-        [HttpPost]
-        public IActionResult Post([FromBody] UserGamePost body)
-        {
-
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            Response.Headers.Add("Content-Type", "application/json");
-            var profile = Profile();
-
-            var id = ObjectId.Parse(body._id).ToString();
-            var filter = Builders<UserGame>.Filter.Eq(x => x._id, id);
-            // Favorite
-            if (body.favorite == true)
-            {
-                var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
-                c_game.UpdateOneAsync(filter, update);
-            }
-            // 
-            if (body.atlas_id != null)
-            {
-                var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
-                c_game.UpdateOneAsync(filter, update);
-            }
-
-            if (body.bgg_id != null)
-            {
-                var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
-                c_game.UpdateOneAsync(filter, update);
-            }
-
-
-            return Ok("success");
-
-
-
-        }
-        [HttpDelete]
-        public IActionResult Delete([FromBody] UserGamePost body)
-        {
-
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            Response.Headers.Add("Content-Type", "application/json");
-            var id = ObjectId.Parse(body._id).ToString();
-            if (CheckSessionId() != false)
-            {
-                c_game.DeleteOne(a => a._id == id);
-                return Ok("true");
             }
             else
             {
