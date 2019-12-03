@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Table } from "react-bootstrap";
 import { Image } from "react-bootstrap";
+import "../App.css";
 export class GameLibrary extends Component {
   renderTableData() {
     return this.props.gamelibrary.map(game => (
@@ -9,9 +10,9 @@ export class GameLibrary extends Component {
           <Image className="gameImage" src={game.images.small}></Image>
         </td>
         <td>{game.name}</td>
-        <td>
+        {/* <td>
           <i className="fas fa-folder-plus fa-fw fa-3x"></i>
-        </td>
+        </td> */}
       </tr>
     ));
   }
@@ -27,7 +28,7 @@ export class GameLibrary extends Component {
               <tr>
                 <th></th>
                 <th>Name</th>
-                <th></th>
+                {/* <th></th> */}
               </tr>
             </thead>
 
