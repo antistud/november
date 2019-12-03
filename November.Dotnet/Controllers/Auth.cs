@@ -20,38 +20,18 @@ namespace November.Dotnet.Controllers
     [Route("Auth")]
     public class AuthController : ControllerBase
     {
-        public IMongoClient client;
-        public IMongoDatabase db;
-        public IMongoCollection<User> c_auth;
-        public IMongoCollection<UserSession> c_sessions;
-        public IMongoCollection<UserProfile> c_profile;
-        public string sg_apiKey;
-        public SendGridClient sg_client;
-        public EmailAddress sg_from;
 
+        public AppHost host;
 
         public AuthController()
         {
-            var dbUser = ConfigDb.username;
-            var password = ConfigDb.password;
-            var host = ConfigDb.host;
-            client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/november?retryWrites=true&w=majority");
-            db = client.GetDatabase("november");
-            c_auth = db.GetCollection<User>("user");
-            c_sessions = db.GetCollection<UserSession>("session");
-            c_profile = db.GetCollection<UserProfile>("profile");
+            host = new AppHost();
 
-            //Send Grid 
-            sg_apiKey = ConfigSendGrid.sendGridApi;
-            sg_client = new SendGridClient(sg_apiKey);
-            sg_from = new EmailAddress("noreply@garishgames.com", "Garish Games");
         }
         [HttpGet]
         public IActionResult Get()
         {
 
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
                 return Ok(Profile());
@@ -67,27 +47,29 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
+
             if (CheckSessionId() != false)
             {
 
                 try
                 {
-                    var docs = c_auth.Find(x => x.username == body.email).ToList().First();
+                    var docs = host.c_auth.Find(x => x.username == body.email).ToList().First();
                     return Ok("User Already Added");
                 }
                 catch
                 {
                     var id = ObjectId.GenerateNewId().ToString();
                     var password = randompassword();
-                    c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
-                    c_profile.InsertOneAsync(new UserProfile { user_id = id, email = body.email });
+                    host.c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
+                    host.c_profile.InsertOneAsync(new UserProfile { user_id = id, email = body.email });
                     var sg_subject = "This is going to be Fun!!!";
                     var sg_to = new EmailAddress(body.email);
                     var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email + " password: " + password;
                     var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email + "<br>password: " + password + "";
-                    var sg_msg = MailHelper.CreateSingleEmail(sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
-                    var sg_response = sg_client.SendEmailAsync(sg_msg);
+                    var sg_msg = MailHelper.CreateSingleEmail(host.sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
+                    var sg_response = host.sg_client.SendEmailAsync(sg_msg);
                     sg_response.ToJson();
                     return Ok("success");
                 }
@@ -104,15 +86,16 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             try
             {
-                c_auth.Find(x => x.username == body.username).ToList().First();
+                host.c_auth.Find(x => x.username == body.username).ToList().First();
                 return Ok("user already exists");
             }
             catch
             {
-                c_auth.InsertOneAsync(new User { username = body.username });
+                host.c_auth.InsertOneAsync(new User { username = body.username });
                 return Ok("success");
             }
 
@@ -120,7 +103,7 @@ namespace November.Dotnet.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] User body)
         {
-            var docs = c_auth.Find(x => x.username == body.username).ToList();
+            var docs = host.c_auth.Find(x => x.username == body.username).ToList();
             var sid = "";
             List<User> results = new List<User>();
             var found = false;
@@ -131,7 +114,7 @@ namespace November.Dotnet.Controllers
                     sid = CreateSessionId();
                     DateTime now = DateTime.Now;
 
-                    c_sessions.InsertOneAsync(new UserSession { username = body.username, session_id = sid, user_id = d._id, created = now });
+                    host.c_sessions.InsertOneAsync(new UserSession { username = body.username, session_id = sid, user_id = d._id, created = now });
                     found = true;
                 }
             }
@@ -150,6 +133,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Patch([FromBody] User body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok(UserPassword.HashPassword(body.password));
 
@@ -159,11 +143,12 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
                 var session_id = Request.Headers["Authorization"];
-                c_sessions.DeleteOne(a => a.session_id == session_id);
+                host.c_sessions.DeleteOne(a => a.session_id == session_id);
                 return Ok("true");
             }
             else
@@ -174,6 +159,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Default()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("Method Not Found");
         }
@@ -188,7 +174,7 @@ namespace November.Dotnet.Controllers
         bool CheckSessionId()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
+            var docs = host.c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
             foreach (var d in docs)
@@ -211,8 +197,8 @@ namespace November.Dotnet.Controllers
         UserProfile Profile()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
-            var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
+            var session = host.c_sessions.Find(x => x.session_id == session_id).ToList().First();
+            var profile = host.c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
             return profile;
         }

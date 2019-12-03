@@ -54,6 +54,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Get()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -79,6 +80,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Put([FromBody] GamePlayPut body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -104,6 +106,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Post([FromBody] User body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("Success");
 
@@ -112,6 +115,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Delete([FromBody] UserGamePost body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
@@ -127,6 +131,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Default()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("Method Not Found");
         }

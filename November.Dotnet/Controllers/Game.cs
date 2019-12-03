@@ -60,6 +60,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -88,6 +89,7 @@ namespace November.Dotnet.Controllers
         public IActionResult GetFriendGames()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
             var query = from friend in c_friend.AsQueryable()
@@ -116,6 +118,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var game_id = ObjectId.Parse(gameId).ToString();
             if (CheckSessionId() != false)
@@ -177,6 +180,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
 
@@ -199,6 +203,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
 
@@ -234,6 +239,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
@@ -250,6 +256,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("Method Not Found");
         }
