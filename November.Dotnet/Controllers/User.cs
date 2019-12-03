@@ -51,6 +51,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Get()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -70,6 +71,7 @@ namespace November.Dotnet.Controllers
         public IActionResult GetFriends()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -88,6 +90,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Put(string id)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
             var friendId = ObjectId.Parse(id).ToString();
@@ -109,6 +112,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Post([FromBody] UserProfile body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -158,6 +162,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Patch([FromBody] User body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("none");
 
@@ -166,6 +171,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Default()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("Method Not Found");
         }

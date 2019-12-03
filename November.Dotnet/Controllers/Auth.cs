@@ -47,6 +47,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
 
             if (CheckSessionId() != false)
@@ -85,6 +86,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             try
             {
@@ -131,6 +133,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Patch([FromBody] User body)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok(UserPassword.HashPassword(body.password));
 
@@ -140,6 +143,7 @@ namespace November.Dotnet.Controllers
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             if (CheckSessionId() != false)
             {
@@ -155,6 +159,7 @@ namespace November.Dotnet.Controllers
         public IActionResult Default()
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             return Ok("Method Not Found");
         }
