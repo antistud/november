@@ -3,6 +3,7 @@ import { Image } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import "../App.css";
 import { isTemplateElement } from "@babel/types";
+import db from '../services/db'
 export class GameInfo extends Component {
   //Colors "add" icon based on whether or not it exists in library
   getIconStyle = gameId => {
@@ -21,7 +22,11 @@ export class GameInfo extends Component {
   };
 
   saveGameCheck = gameId => {
+    console.log('savegame executed')
     if (!this.getLibraryIds().includes(gameId)) {
+      db.addGame(localStorage.getItem('apiKey'), gameId).then(res => { if (res.status != 200) { alert('There was an error saving the game') } }).catch(error => {
+        alert(error)
+      });
       return this.props.saveGame.bind(this, this.props.game);
     } else {
       return;
@@ -40,7 +45,7 @@ export class GameInfo extends Component {
           <i
             style={this.getIconStyle(id)}
             className="fas fa-folder-plus fa-fw fa-3x"
-            onClick={this.saveGameCheck(id)}
+            onClick={() => { this.saveGameCheck(id) }}
           ></i>
         </td>
       </tr>

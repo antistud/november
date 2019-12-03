@@ -28,7 +28,7 @@ export class GameLibrary extends Component {
               <tr>
                 <th></th>
                 <th>Name</th>
-                <th></th>
+                {/* <th></th> */}
               </tr>
             </thead>
 

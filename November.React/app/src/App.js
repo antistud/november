@@ -47,7 +47,10 @@ class App extends Component {
   componentDidMount() {
     if (localStorage.getItem("apiKey") !== null) {
       db.getGames(localStorage.getItem("apiKey")).then(response => {
-        console.log("games: ", response);
+        const ids = response.data.map(game => { return game.atlas_id }).toString()
+        searchGames("https://www.boardgameatlas.com/api/search?ids=" + ids + "&client_id=PaLV4upJP7").then(gameData => {
+          this.setState({ gamelibrary: gameData.data.games })
+        })
       });
     }
     //localStorage.clear();
@@ -69,8 +72,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-        searchstring +
-        "&limit=10&client_id=PaLV4upJP7"
+      searchstring +
+      "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       console.log(response.data.games);
       this.setState({
@@ -87,7 +90,7 @@ class App extends Component {
       console.log(response);
       localStorage.setItem("apiKey", response.data);
       db.getProfile(response.data).then(profile => {
-        localStorage.setItem("profile", JSON.stringify(profile));
+        localStorage.setItem("profile", JSON.stringify(profile.data));
         console.log(profile);
       });
     });
@@ -109,7 +112,7 @@ class App extends Component {
       <Router>
         <div className="App">
           <AppNavbar
-            username={this.state.username}
+            username={localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')).name : ''}
             apptitle={this.state.apptitle}
             apiKey={localStorage.getItem("apiKey")}
           ></AppNavbar>

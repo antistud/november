@@ -13,24 +13,32 @@ const db = {
   logout(apiKey) {
     return axios.delete(
       this.host + "/auth",
-      { Authorization: "Bearer" + apiKey },
-      { headers: { "Content-Type": "application/json" } }
+
+      { headers: { "Content-Type": "application/json", Authorization: apiKey } }
     );
   },
   getGames(apiKey) {
     return axios.get(
       this.host + "/Game",
-      { Authorization: "Bearer" + apiKey },
-      { headers: { "Content-Type": "application/json" } }
+
+      { headers: { "Content-Type": "application/json", Authorization: apiKey } }
     );
   },
   getProfile(apiKey) {
     return axios.get(
       this.host + "/auth",
-      { Authorization: "Bearer" + apiKey },
-      { headers: { "Content-Type": "application/json" } }
+
+      { headers: { "Content-Type": "application/json", Authorization: apiKey } }
     );
-  }
+  },
+  addGame(apiKey, id) {
+    return axios.put(
+      this.host + "/Game",
+      { atlas_id: id },
+      { headers: { "Content-Type": "application/json", Authorization: apiKey } }
+    );
+  },
+
 };
 
 export default db;
