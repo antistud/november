@@ -1,16 +1,16 @@
 import React, { Component } from "react";
 import GameSearch from "./components/GameSearch";
-import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 
 import searchGames from "./services/SearchGames";
-import db from "./services/db"
+import db from "./services/db";
 import AppNavbar from "./components/AppNavbar";
 import GameSearchBox from "./components/GameSearchBox";
 import { Container } from "react-bootstrap";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
-import Login from "./components/pages/Login"
+import Login from "./components/pages/Login";
 class App extends Component {
   constructor(props) {
     super(props);
@@ -20,33 +20,35 @@ class App extends Component {
       gamelibrary: [],
       username: "jfloth",
       uderId: "1",
-      otherlibraries: [{ username: 'jrhoades', userId: '2', gamelibrary: [] }],
+      otherlibraries: [],
       authorize: { username: "", password: "" }
     };
   }
   isAuthed() {
-    if (localStorage.getItem('apiKey') !== null) {
-      console.log('apikey exists', localStorage.getItem('apiKey'))
-      return (<Route exact path="/">
-        <Homepage
-          username={this.state.username}
-          gamelibrary={this.state.gamelibrary}
-        ></Homepage></Route>)
-    }
-    else {
-      console.log('no apikey')
-      return (<Route exact path="/">
-        <Login authorize={this.authorize}></Login></Route>)
+    if (localStorage.getItem("apiKey") !== null) {
+      // console.log("apikey exists", localStorage.getItem("apiKey"));
+      return (
+        <Route exact path="/">
+          <Homepage
+            username={this.state.username}
+            gamelibrary={this.state.gamelibrary}
+          ></Homepage>
+        </Route>
+      );
+    } else {
+      // console.log("no apikey");
+      return (
+        <Route exact path="/">
+          <Login authorize={this.authorize}></Login>
+        </Route>
+      );
     }
   }
   componentDidMount() {
-    this.isAuthed();
-    if (!localStorage.getItem("gamelibrary") !== null) {
-      this.setState({
-        gamelibrary: JSON.parse(localStorage.getItem("gamelibrary"))
+    if (localStorage.getItem("apiKey") !== null) {
+      db.getGames(localStorage.getItem("apiKey")).then(response => {
+        console.log("games: ", response);
       });
-    } else {
-      localStorage.setItem("gamelibrary", JSON.stringify([]));
     }
     //localStorage.clear();
     //console.log(JSON.parse(localStorage.getItem("gamelibrary")));
@@ -67,8 +69,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-      searchstring +
-      "&limit=10&client_id=PaLV4upJP7"
+        searchstring +
+        "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       console.log(response.data.games);
       this.setState({
@@ -81,14 +83,13 @@ class App extends Component {
   };
 
   authorize = body => {
-
-    db.login(
-      "http://november.garishgames.com/auth", body
-    ).then(response => {
+    db.login(body).then(response => {
       console.log(response);
-      localStorage.setItem('apiKey', response.data)
-
-      return <Redirect to="/" />;
+      localStorage.setItem("apiKey", response.data);
+      db.getProfile(response.data).then(profile => {
+        localStorage.setItem("profile", JSON.stringify(profile));
+        console.log(profile);
+      });
     });
 
     console.log(this.state.apiKey);
@@ -104,19 +105,18 @@ class App extends Component {
     });
   };
   render() {
-    const selectHomepage = this.isAuthed()
     return (
       <Router>
         <div className="App">
           <AppNavbar
             username={this.state.username}
             apptitle={this.state.apptitle}
-            apiKey={localStorage.getItem('apiKey')}
+            apiKey={localStorage.getItem("apiKey")}
           ></AppNavbar>
 
           <Container className="p-3">
             <Route exact path="/">
-              {selectHomepage}
+              {this.isAuthed()}
             </Route>
             <Route
               exact
@@ -134,7 +134,9 @@ class App extends Component {
               )}
             ></Route>
             <Route path="/about" component={About}></Route>
-            <Route path="/login" ><Login authorize={this.authorize}></Login></Route>
+            <Route path="/login">
+              <Login authorize={this.authorize}></Login>
+            </Route>
           </Container>
         </div>
       </Router>
