@@ -17,7 +17,6 @@ using SendGrid.Helpers.Mail;
 namespace November.Dotnet.Controllers
 {
     [ApiController]
-    [EnableCors("AllowAllOrigins")]
     [Route("Game")]
     public class GameController : ControllerBase
     {
