@@ -19,37 +19,13 @@ namespace November.Dotnet.Controllers
     [Route("[controller]")]
     public class RequestController : ControllerBase
     {
-        public IMongoClient client;
-        public IMongoDatabase db;
-        public IMongoCollection<User> c_auth;
-        public IMongoCollection<UserSession> c_sessions;
-        public IMongoCollection<UserProfile> c_profile;
-        public string sg_apiKey;
-        public SendGridClient sg_client;
-        public EmailAddress sg_from;
-        public IMongoCollection<UserGame> c_game;
-        public IMongoCollection<GamePlay> c_play;
-        public IMongoCollection<GameRequest> c_request;
 
+        public AppHost host;
 
         public RequestController()
         {
-            var dbUser = ConfigDb.username;
-            var password = ConfigDb.password;
-            var host = ConfigDb.host;
-            client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/november?retryWrites=true&w=majority");
-            db = client.GetDatabase("november");
-            c_auth = db.GetCollection<User>("user");
-            c_sessions = db.GetCollection<UserSession>("session");
-            c_profile = db.GetCollection<UserProfile>("profile");
-            c_game = db.GetCollection<UserGame>("game");
-            c_play = db.GetCollection<GamePlay>("play");
-            c_request = db.GetCollection<GameRequest>("request");
+            host = new AppHost();
 
-            //Send Grid 
-            sg_apiKey = ConfigSendGrid.sendGridApi;
-            sg_client = new SendGridClient(sg_apiKey);
-            sg_from = new EmailAddress("jon@t3ch.net", "Example User");
 
         }
         [HttpGet]
@@ -71,8 +47,8 @@ namespace November.Dotnet.Controllers
                 // ls.Add(new GameRequestReturn() { mine = docs, others = games });
                 // var json = JsonConvert.SerializeObject(ls);
 
-                var query = from request in c_request.AsQueryable()
-                            join game in c_game.AsQueryable() on
+                var query = from request in host.c_request.AsQueryable()
+                            join game in host.c_game.AsQueryable() on
                             request.game_id equals game._id into game
                             select new { request, game };
                 List<GameRequest> gamesls = new List<GameRequest>();
@@ -117,7 +93,7 @@ namespace November.Dotnet.Controllers
 
                 var id = ObjectId.GenerateNewId().ToString();
                 var gameId = ObjectId.Parse(body.game_id).ToString();
-                c_request.InsertOneAsync(new GameRequest { _id = id, game_id = gameId, user_id = profile.user_id });
+                host.c_request.InsertOneAsync(new GameRequest { _id = id, game_id = gameId, user_id = profile.user_id });
                 return Ok(id.ToString());
 
             }
@@ -141,34 +117,34 @@ namespace November.Dotnet.Controllers
             if (body.step == "send_sent")
             {
                 var update = Builders<GameRequest>.Update.Set(x => x.send_sent, now);
-                c_request.UpdateOneAsync(filter, update);
+                host.c_request.UpdateOneAsync(filter, update);
             }
             // 
             if (body.step == "send_recieved")
             {
                 var update = Builders<GameRequest>.Update.Set(x => x.send_recieved, now);
-                c_request.UpdateOneAsync(filter, update);
+                host.c_request.UpdateOneAsync(filter, update);
             }
 
             if (body.step == "return_recieved")
             {
                 var update = Builders<GameRequest>.Update.Set(x => x.return_recieved, now);
-                c_request.UpdateOneAsync(filter, update);
+                host.c_request.UpdateOneAsync(filter, update);
             }
             if (body.step == "return_sent")
             {
                 var update = Builders<GameRequest>.Update.Set(x => x.return_sent, now);
-                c_request.UpdateOneAsync(filter, update);
+                host.c_request.UpdateOneAsync(filter, update);
             }
             if (body.requester_rating != 0)
             {
                 var update = Builders<GameRequest>.Update.Set(x => x.requester_rating, body.requester_rating);
-                c_request.UpdateOneAsync(filter, update);
+                host.c_request.UpdateOneAsync(filter, update);
             }
             if (body.lender_rating != 0)
             {
                 var update = Builders<GameRequest>.Update.Set(x => x.lender_rating, body.lender_rating);
-                c_request.UpdateOneAsync(filter, update);
+                host.c_request.UpdateOneAsync(filter, update);
             }
 
             return Ok("success");
@@ -184,7 +160,7 @@ namespace November.Dotnet.Controllers
             var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
             {
-                c_request.DeleteOne(a => a._id == id);
+                host.c_request.DeleteOne(a => a._id == id);
                 return Ok("true");
             }
             else
@@ -203,7 +179,7 @@ namespace November.Dotnet.Controllers
         bool CheckSessionId()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
+            var docs = host.c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
             foreach (var d in docs)
@@ -226,8 +202,8 @@ namespace November.Dotnet.Controllers
         UserProfile Profile()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
-            var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
+            var session = host.c_sessions.Find(x => x.session_id == session_id).ToList().First();
+            var profile = host.c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
             return profile;
         }
