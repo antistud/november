@@ -2,6 +2,15 @@ import axios from "axios";
 
 const db = {
   host: "http://november.garishgames.com",
+  auth_headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    Authorization: apiKey
+  },
+  headers: {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*"
+  },
   login(body) {
     return axios.post(this.host + "/auth", body, {
       headers: {
@@ -37,8 +46,7 @@ const db = {
       { atlas_id: id },
       { headers: { "Content-Type": "application/json", Authorization: apiKey } }
     );
-  },
-
+  }
 };
 
 export default db;
