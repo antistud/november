@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Table } from "react-bootstrap";
 import { Image } from "react-bootstrap";
-import searchGames from "../services/SearchGames";
+
 import "../App.css";
 export class GameLibrary extends Component {
 

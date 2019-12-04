@@ -10,7 +10,8 @@ export class GameSearch extends Component {
         key={game.id}
         game={game}
         gamelibrary={this.props.gamelibrary}
-        // markAvailable={this.props.markAvailable}
+        updategamelibrary={this.props.updategamelibrary}
+      // markAvailable={this.props.markAvailable}
       />
     ));
   }

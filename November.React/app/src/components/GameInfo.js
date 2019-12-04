@@ -26,6 +26,7 @@ export class GameInfo extends Component {
     if (!this.getLibraryIds().includes(gameId)) {
       db.addGame(localStorage.getItem("apiKey"), gameId)
         .then(res => {
+          this.props.updategamelibrary();
           if (res.status != 200) {
             alert("There was an error saving the game");
           }

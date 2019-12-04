@@ -1,13 +1,12 @@
 import React, { Component } from "react";
-import GameSearch from "./components/GameSearch";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Container } from "react-bootstrap";
 import "./App.css";
-
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import searchGames from "./services/SearchGames";
 import db from "./services/db";
 import AppNavbar from "./components/AppNavbar";
 import GameSearchBox from "./components/GameSearchBox";
-import { Container } from "react-bootstrap";
+import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
 import Login from "./components/pages/Login";
@@ -55,7 +54,8 @@ class App extends Component {
       });
   }
 
-  getGameLibrary() {
+  getGameLibrary = () => {
+    console.log('getGameLibrary() called')
     db.getGames(localStorage.getItem("apiKey")).then(response => {
       const ids = response.data.map(game => {
         return game.atlas_id;
@@ -82,17 +82,7 @@ class App extends Component {
     //console.log(JSON.parse(localStorage.getItem("gamelibrary")));
   }
 
-  //toggle game availability
-  markAvailable = id => {
-    this.setState({
-      games: this.state.games.map(game => {
-        if (game.id === id) {
-          game.available = !game.available;
-        }
-        return game;
-      })
-    });
-  };
+
 
   gameSearch = searchstring => {
     searchGames(
@@ -155,6 +145,7 @@ class App extends Component {
                   <GameSearch
                     games={this.state.games}
                     gamelibrary={this.state.gamelibrary}
+                    updategamelibrary={this.getGameLibrary}
                   />
                 </React.Fragment>
               )}
