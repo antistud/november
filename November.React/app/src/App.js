@@ -22,10 +22,7 @@ class App extends Component {
       otherlibraries: [],
       authorize: { username: "", password: "" }
     };
-    this.isAuthed();
-    if (localStorage.getItem("apiKey") !== null) {
-      this.getGameLibrary();
-    }
+
   }
   selectHomepage() {
     if (localStorage.getItem("apiKey") !== null) {
@@ -62,12 +59,25 @@ class App extends Component {
     db.getGames(localStorage.getItem("apiKey")).then(response => {
       const ids = response.data.map(game => {
         return game.atlas_id;
-      });
-      this.setState({ gamelibrary: ids });
-      console.log(this.state);
-    });
+      }).toString();
+      if (ids) {
+        searchGames(
+          "https://www.boardgameatlas.com/api/search?ids=" +
+          ids +
+          "&client_id=PaLV4upJP7"
+        ).then(gameData => {
+          console.log("game data");
+          this.setState({ gamelibrary: gameData.data.games });
+        });
+      };
+
+    })
   }
   componentDidMount() {
+    this.isAuthed();
+    if (localStorage.getItem("apiKey") !== null) {
+      this.getGameLibrary();
+    }
     //localStorage.clear();
     //console.log(JSON.parse(localStorage.getItem("gamelibrary")));
   }
@@ -87,8 +97,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-        searchstring +
-        "&limit=10&client_id=PaLV4upJP7"
+      searchstring +
+      "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       console.log(response.data.games);
       this.setState({

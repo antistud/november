@@ -4,23 +4,10 @@ import { Image } from "react-bootstrap";
 import searchGames from "../services/SearchGames";
 import "../App.css";
 export class GameLibrary extends Component {
-  state = { gamelibrary: [] };
-  componentDidMount() {
-    console.log("gamelibrary component did mount");
-    const ids = this.props.gamelibrary.toString();
-    if (ids) {
-      searchGames(
-        "https://www.boardgameatlas.com/api/search?ids=" +
-          ids +
-          "&client_id=PaLV4upJP7"
-      ).then(gameData => {
-        console.log("game data");
-        this.setState({ gamelibrary: gameData.data.games });
-      });
-    }
-  }
+
+
   renderTableData() {
-    return this.state.gamelibrary.map(game => (
+    return this.props.gamelibrary.map(game => (
       <tr>
         <td>
           <Image className="gameImage" src={game.images.small}></Image>
