@@ -19,12 +19,15 @@ class App extends Component {
       games: [],
       gamelibrary: [],
       username: "jfloth",
-      uderId: "1",
       otherlibraries: [],
       authorize: { username: "", password: "" }
     };
+    this.isAuthed();
+    if (localStorage.getItem("apiKey") !== null) {
+      this.getGameLibrary();
+    }
   }
-  isAuthed() {
+  selectHomepage() {
     if (localStorage.getItem("apiKey") !== null) {
       // console.log("apikey exists", localStorage.getItem("apiKey"));
       return (
@@ -44,15 +47,27 @@ class App extends Component {
       );
     }
   }
-  componentDidMount() {
-    if (localStorage.getItem("apiKey") !== null) {
-      db.getGames(localStorage.getItem("apiKey")).then(response => {
-        const ids = response.data.map(game => { return game.atlas_id }).toString()
-        searchGames("https://www.boardgameatlas.com/api/search?ids=" + ids + "&client_id=PaLV4upJP7").then(gameData => {
-          this.setState({ gamelibrary: gameData.data.games })
-        })
+  isAuthed() {
+    db.getProfile(localStorage.getItem("apiKey"))
+      .then(profile => {
+        localStorage.setItem("profile", JSON.stringify(profile.data));
+        // console.log(profile);
+      })
+      .catch(error => {
+        alert(error);
       });
-    }
+  }
+
+  getGameLibrary() {
+    db.getGames(localStorage.getItem("apiKey")).then(response => {
+      const ids = response.data.map(game => {
+        return game.atlas_id;
+      });
+      this.setState({ gamelibrary: ids });
+      console.log(this.state);
+    });
+  }
+  componentDidMount() {
     //localStorage.clear();
     //console.log(JSON.parse(localStorage.getItem("gamelibrary")));
   }
@@ -72,8 +87,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-      searchstring +
-      "&limit=10&client_id=PaLV4upJP7"
+        searchstring +
+        "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       console.log(response.data.games);
       this.setState({
@@ -86,40 +101,39 @@ class App extends Component {
   };
 
   authorize = body => {
-    db.login(body).then(response => {
-      console.log(response);
-      localStorage.setItem("apiKey", response.data);
-      db.getProfile(response.data).then(profile => {
-        localStorage.setItem("profile", JSON.stringify(profile.data));
-        console.log(profile);
+    db.login(body)
+      .then(response => {
+        console.log("auth response: ", response);
+        if (response.data != "missing or wrong password") {
+          localStorage.setItem("apiKey", response.data);
+          this.isAuthed();
+        } else {
+          alert("Credentials unrecognized. Please try again!");
+        }
+      })
+      .catch(error => {
+        localStorage.removeItem("apiKey");
+        alert("invalid credentials");
       });
-    });
-
-    console.log(this.state.apiKey);
   };
 
-  saveGame = game => {
-    var currentlist = JSON.parse(localStorage.getItem("gamelibrary")) || [];
-    currentlist.push(game);
-    console.log(JSON.parse(localStorage.getItem("gamelibrary")));
-    localStorage.setItem("gamelibrary", JSON.stringify(currentlist));
-    this.setState({
-      gamelibrary: JSON.parse(localStorage.getItem("gamelibrary"))
-    });
-  };
   render() {
     return (
       <Router>
         <div className="App">
           <AppNavbar
-            username={localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')).name : ''}
+            username={
+              localStorage.getItem("profile")
+                ? JSON.parse(localStorage.getItem("profile")).name
+                : ""
+            }
             apptitle={this.state.apptitle}
             apiKey={localStorage.getItem("apiKey")}
           ></AppNavbar>
 
           <Container className="p-3">
             <Route exact path="/">
-              {this.isAuthed()}
+              {this.selectHomepage()}
             </Route>
             <Route
               exact
@@ -130,7 +144,6 @@ class App extends Component {
                   <br />
                   <GameSearch
                     games={this.state.games}
-                    saveGame={this.saveGame}
                     gamelibrary={this.state.gamelibrary}
                   />
                 </React.Fragment>

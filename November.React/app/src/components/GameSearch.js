@@ -9,7 +9,6 @@ export class GameSearch extends Component {
       <GameInfo
         key={game.id}
         game={game}
-        saveGame={this.props.saveGame}
         gamelibrary={this.props.gamelibrary}
         // markAvailable={this.props.markAvailable}
       />
