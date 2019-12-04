@@ -2,9 +2,9 @@ import React, { Component } from "react";
 import GameSearch from "./components/GameSearch";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
-
 import searchGames from "./services/SearchGames";
 import db from "./services/db";
+import Game from "./services/game";
 import AppNavbar from "./components/AppNavbar";
 import GameSearchBox from "./components/GameSearchBox";
 import { Container } from "react-bootstrap";
@@ -46,11 +46,22 @@ class App extends Component {
   }
   componentDidMount() {
     if (localStorage.getItem("apiKey") !== null) {
+      Game.getGames().then(data => {
+        console.log("games", data);
+      });
       db.getGames(localStorage.getItem("apiKey")).then(response => {
-        const ids = response.data.map(game => { return game.atlas_id }).toString()
-        searchGames("https://www.boardgameatlas.com/api/search?ids=" + ids + "&client_id=PaLV4upJP7").then(gameData => {
-          this.setState({ gamelibrary: gameData.data.games })
-        })
+        const ids = response.data
+          .map(game => {
+            return game.atlas_id;
+          })
+          .toString();
+        searchGames(
+          "https://www.boardgameatlas.com/api/search?ids=" +
+            ids +
+            "&client_id=PaLV4upJP7"
+        ).then(gameData => {
+          this.setState({ gamelibrary: gameData.data.games });
+        });
       });
     }
     //localStorage.clear();
@@ -72,8 +83,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-      searchstring +
-      "&limit=10&client_id=PaLV4upJP7"
+        searchstring +
+        "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       console.log(response.data.games);
       this.setState({
@@ -112,7 +123,11 @@ class App extends Component {
       <Router>
         <div className="App">
           <AppNavbar
-            username={localStorage.getItem('profile') ? JSON.parse(localStorage.getItem('profile')).name : ''}
+            username={
+              localStorage.getItem("profile")
+                ? JSON.parse(localStorage.getItem("profile")).name
+                : ""
+            }
             apptitle={this.state.apptitle}
             apiKey={localStorage.getItem("apiKey")}
           ></AppNavbar>

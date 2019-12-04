@@ -5,7 +5,7 @@ const db = {
   auth_headers: {
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "*",
-    Authorization: apiKey
+    Authorization: localStorage.getItem("apiKey")
   },
   headers: {
     "Content-Type": "application/json",
