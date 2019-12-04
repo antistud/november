@@ -43,7 +43,7 @@ class App extends Component {
       );
     }
   }
-  isAuthed() {
+  getProfile() {
     db.getProfile(localStorage.getItem("apiKey"))
       .then(profile => {
         localStorage.setItem("profile", JSON.stringify(profile.data));
@@ -57,24 +57,12 @@ class App extends Component {
   getGameLibrary = () => {
     console.log('getGameLibrary() called')
     db.getGames(localStorage.getItem("apiKey")).then(response => {
-      const ids = response.data.map(game => {
-        return game.atlas_id;
-      }).toString();
-      if (ids) {
-        searchGames(
-          "https://www.boardgameatlas.com/api/search?ids=" +
-          ids +
-          "&client_id=PaLV4upJP7"
-        ).then(gameData => {
-          console.log("game data");
-          this.setState({ gamelibrary: gameData.data.games });
-        });
-      };
+      this.setState({ gamelibrary: response.data })
 
     })
   }
-  componentDidMount() {
-    this.isAuthed();
+  componentWillMount() {
+    this.getProfile();
     if (localStorage.getItem("apiKey") !== null) {
       this.getGameLibrary();
     }
@@ -106,7 +94,7 @@ class App extends Component {
         console.log("auth response: ", response);
         if (response.data != "missing or wrong password") {
           localStorage.setItem("apiKey", response.data);
-          this.isAuthed();
+          this.getProfile();
         } else {
           alert("Credentials unrecognized. Please try again!");
         }
