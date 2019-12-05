@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Cors;
@@ -10,9 +12,9 @@ using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using MongoDB.Bson.Serialization;
 
 namespace November.Dotnet.Controllers
 {
@@ -20,42 +22,19 @@ namespace November.Dotnet.Controllers
     [Route("Game")]
     public class GameController : ControllerBase
     {
-        public IMongoClient client;
-        public IMongoDatabase db;
-        public IMongoCollection<User> c_auth;
-        public IMongoCollection<UserSession> c_sessions;
-        public IMongoCollection<UserProfile> c_profile;
-        public string sg_apiKey;
-        public SendGridClient sg_client;
-        public EmailAddress sg_from;
-        public IMongoCollection<UserGame> c_game;
-        public IMongoCollection<GamePlay> c_play;
-        public IMongoCollection<GameRequest> c_request;
-        public IMongoCollection<UserFriend> c_friend;
+
+        public AppHost host;
         public GameController()
         {
 
-            var dbUser = ConfigDb.username;
-            var password = ConfigDb.password;
-            var host = ConfigDb.host;
-            client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/november?retryWrites=true&w=majority");
-            db = client.GetDatabase("november");
-            c_auth = db.GetCollection<User>("user");
-            c_sessions = db.GetCollection<UserSession>("session");
-            c_profile = db.GetCollection<UserProfile>("profile");
-            c_game = db.GetCollection<UserGame>("game");
-            c_play = db.GetCollection<GamePlay>("play");
-            c_request = db.GetCollection<GameRequest>("request");
-            c_friend = db.GetCollection<UserFriend>("friend");
+            host = new AppHost();
 
-            //Send Grid 
-            sg_apiKey = ConfigSendGrid.sendGridApi;
-            sg_client = new SendGridClient(sg_apiKey);
-            sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
 
+
+
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] bool atlas)
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
@@ -67,8 +46,28 @@ namespace November.Dotnet.Controllers
                 var profile = Profile();
                 try
                 {
-                    var docs = c_game.Find(x => x.user_id == profile.user_id).ToList();
-                    var json = JsonConvert.SerializeObject(docs);
+                    var docs = host.c_game.Find(x => x.user_id == profile.user_id).ToList();
+                    var games = new List<UserGame>();
+                    foreach (var doc in docs)
+                    {
+                        if (atlas == true)
+                        {
+
+                            try
+                            {
+                                var cache = host.c_atlas.Find(x => x.atlas_id == doc.atlas_id).ToList().First().cache;
+                                doc.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
+
+                            }
+                            catch
+                            {
+                                var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + doc.atlas_id);
+                                doc.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                                host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = doc.atlas_id, cache = atlas_api });
+                            }
+                        }
+                        games.Add(doc);
+                    }
                     return Ok(docs);
                 }
                 catch
@@ -94,13 +93,24 @@ namespace November.Dotnet.Controllers
 
             try
             {
-                var docs = c_game.Find(x => x.user_id == profile.user_id && x.atlas_id == body.atlas_id).ToList().First();
+                var docs = host.c_game.Find(x => x.user_id == profile.user_id && x.atlas_id == body.atlas_id).ToList().First();
                 return Ok("Game Already Added");
             }
             catch
             {
+
+                try
+                {
+                    var atlas_game = host.c_atlas.Find(x => x.atlas_id == body.atlas_id).ToList().First().cache;
+                }
+                catch
+                {
+                    var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + body.atlas_id);
+                    host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = body.atlas_id, cache = api });
+                }
+
                 var id = ObjectId.GenerateNewId().ToString();
-                c_game.InsertOneAsync(new UserGame { _id = id, atlas_id = body.atlas_id, user_id = profile.user_id });
+                host.c_game.InsertOneAsync(new UserGame { _id = id, atlas_id = body.atlas_id, user_id = profile.user_id });
                 return Ok(id.ToString());
             }
 
@@ -121,19 +131,19 @@ namespace November.Dotnet.Controllers
             if (body.favorite == true)
             {
                 var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
-                c_game.UpdateOneAsync(filter, update);
+                host.c_game.UpdateOneAsync(filter, update);
             }
             // 
             if (body.atlas_id != null)
             {
                 var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
-                c_game.UpdateOneAsync(filter, update);
+                host.c_game.UpdateOneAsync(filter, update);
             }
 
             if (body.bgg_id != null)
             {
                 var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
-                c_game.UpdateOneAsync(filter, update);
+                host.c_game.UpdateOneAsync(filter, update);
             }
 
 
@@ -152,7 +162,7 @@ namespace November.Dotnet.Controllers
             var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
             {
-                c_game.DeleteOne(a => a._id == id);
+                host.c_game.DeleteOne(a => a._id == id);
                 return Ok("true");
             }
             else
@@ -163,14 +173,14 @@ namespace November.Dotnet.Controllers
 
         [Route("Friends")]
         [HttpGet]
-        public IActionResult GetFriendGames()
+        public IActionResult GetFriendGames([FromQuery] bool atlas)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
             var profile = Profile();
-            var query = from friend in c_friend.AsQueryable()
-                        join game in c_game.AsQueryable() on
+            var query = from friend in host.c_friend.AsQueryable()
+                        join game in host.c_game.AsQueryable() on
                         friend.friend_id equals game.user_id into game
                         select new { friend, game };
 
@@ -181,6 +191,22 @@ namespace November.Dotnet.Controllers
                 {
                     foreach (var g in q.game)
                     {
+                        if (atlas == true)
+                        {
+
+                            try
+                            {
+                                var cache = host.c_atlas.Find(x => x.atlas_id == g.atlas_id).ToList().First().cache;
+                                g.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
+
+                            }
+                            catch
+                            {
+                                var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + g.atlas_id);
+                                g.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                                host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = g.atlas_id, cache = atlas_api });
+                            }
+                        }
                         gamesls.Add(g);
                     }
 
@@ -204,24 +230,30 @@ namespace November.Dotnet.Controllers
                 var profile = Profile();
                 try
                 {
-                    var docs = c_game.Find(x => x._id == game_id).ToList().First();
+                    var docs = host.c_game.Find(x => x._id == game_id).ToList().First();
                     if (atlas == true)
                     {
+
+                        var atlas_game = new AtlasGame();
                         try
                         {
-                            var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=PaLV4upJP7&ids=" + docs.atlas_id);
-                            docs.atlas = JsonConvert.DeserializeObject(api);
+                            var cache = host.c_atlas.Find(x => x.atlas_id == docs.atlas_id).ToList().First().cache;
+                            docs.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
+
                         }
                         catch
                         {
-
+                            var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + docs.atlas_id);
+                            docs.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                            host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = docs.atlas_id, cache = atlas_api });
                         }
+
                     }
                     if (play == true)
                     {
                         try
                         {
-                            docs.play = c_play.Find(x => x.game_id == game_id).ToList().First();
+                            docs.play = host.c_play.Find(x => x.game_id == game_id).ToList().First();
                         }
                         catch
                         {
@@ -232,7 +264,7 @@ namespace November.Dotnet.Controllers
                     {
                         try
                         {
-                            docs.request = c_request.Find(x => x.game_id == game_id).ToList().First();
+                            docs.request = host.c_request.Find(x => x.game_id == game_id).ToList().First();
                         }
                         catch
                         {
@@ -264,7 +296,7 @@ namespace November.Dotnet.Controllers
         bool CheckSessionId()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
+            var docs = host.c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
             foreach (var d in docs)
@@ -287,8 +319,8 @@ namespace November.Dotnet.Controllers
         UserProfile Profile()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
-            var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
+            var session = host.c_sessions.Find(x => x.session_id == session_id).ToList().First();
+            var profile = host.c_profile.Find(x => x.user_id == session.user_id).ToList().First();
             return profile;
         }
     }

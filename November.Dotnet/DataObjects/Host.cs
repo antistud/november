@@ -15,6 +15,11 @@ namespace November.Dotnet
         public IMongoCollection<User> c_auth;
         public IMongoCollection<UserSession> c_sessions;
         public IMongoCollection<UserProfile> c_profile;
+        public IMongoCollection<UserGame> c_game;
+        public IMongoCollection<UserFriend> c_friend;
+        public IMongoCollection<GamePlay> c_play;
+        public IMongoCollection<GameRequest> c_request;
+        public IMongoCollection<AtlasGame> c_atlas;
         public string sg_apiKey;
         public SendGridClient sg_client;
         public EmailAddress sg_from;
@@ -29,6 +34,11 @@ namespace November.Dotnet
             c_auth = db.GetCollection<User>("user");
             c_sessions = db.GetCollection<UserSession>("session");
             c_profile = db.GetCollection<UserProfile>("profile");
+            c_game = db.GetCollection<UserGame>("game");
+            c_friend = db.GetCollection<UserFriend>("friend");
+            c_play = db.GetCollection<GamePlay>("play");
+            c_request = db.GetCollection<GameRequest>("request");
+            c_atlas = db.GetCollection<AtlasGame>("atlas");
 
             //Send Grid 
             sg_apiKey = ConfigSendGrid.sendGridApi;

@@ -18,34 +18,12 @@ namespace November.Dotnet.Controllers
     [Route("User")]
     public class UserController : ControllerBase
     {
-        public IMongoClient client;
-        public IMongoDatabase db;
-        public IMongoCollection<User> c_auth;
-        public IMongoCollection<UserSession> c_sessions;
-        public IMongoCollection<UserProfile> c_profile;
-        public IMongoCollection<UserFriend> c_friend;
-        public string sg_apiKey;
-        public SendGridClient sg_client;
-        public EmailAddress sg_from;
-
+        public AppHost host;
 
         public UserController()
         {
-            var dbUser = ConfigDb.username;
-            var password = ConfigDb.password;
-            var host = ConfigDb.host;
-            client = new MongoClient($"mongodb+srv://{dbUser}:{password}@{host}/november?retryWrites=true&w=majority");
-            db = client.GetDatabase("november");
-            c_auth = db.GetCollection<User>("user");
-            c_sessions = db.GetCollection<UserSession>("session");
-            c_profile = db.GetCollection<UserProfile>("profile");
+            host = new AppHost();
 
-            c_friend = db.GetCollection<UserFriend>("friend");
-
-            //Send Grid 
-            sg_apiKey = ConfigSendGrid.sendGridApi;
-            sg_client = new SendGridClient(sg_apiKey);
-            sg_from = new EmailAddress("jon@t3ch.net", "Example User");
         }
         [HttpGet]
         public IActionResult Get()
@@ -76,7 +54,7 @@ namespace November.Dotnet.Controllers
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
-                var docs = c_friend.Find(x => x.user_id == profile.user_id).ToList();
+                var docs = host.c_friend.Find(x => x.user_id == profile.user_id).ToList();
                 return Ok(docs);
             }
             else
@@ -96,13 +74,13 @@ namespace November.Dotnet.Controllers
             var friendId = ObjectId.Parse(id).ToString();
             try
             {
-                var docs = c_friend.Find(x => x.user_id == profile.user_id && x.friend_id == friendId).ToList().First();
+                var docs = host.c_friend.Find(x => x.user_id == profile.user_id && x.friend_id == friendId).ToList().First();
                 return Ok("Friend Already Added");
             }
             catch
             {
                 var newid = ObjectId.GenerateNewId().ToString();
-                c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = friendId, user_id = profile.user_id });
+                host.c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = friendId, user_id = profile.user_id });
                 return Ok(id.ToString());
             }
 
@@ -122,37 +100,37 @@ namespace November.Dotnet.Controllers
                 if (body.name != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.name, body.name);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
                 if (body.email != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.email, body.email);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
                 if (body.phone != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.phone, body.phone);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
                 if (body.address != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.address, body.address);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
                 if (body.city != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.city, body.city);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
                 if (body.state != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.state, body.state);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
                 if (body.zip != null)
                 {
                     var update = Builders<UserProfile>.Update.Set(x => x.zip, body.zip);
-                    c_profile.UpdateOneAsync(filter, update);
+                    host.c_profile.UpdateOneAsync(filter, update);
                 }
             }
             return Ok("Success");
@@ -179,7 +157,7 @@ namespace November.Dotnet.Controllers
         bool CheckSessionId()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var docs = c_sessions.Find(x => x.session_id == session_id).ToList();
+            var docs = host.c_sessions.Find(x => x.session_id == session_id).ToList();
             List<UserSession> results = new List<UserSession>();
             var found = false;
             foreach (var d in docs)
@@ -202,8 +180,8 @@ namespace November.Dotnet.Controllers
         UserProfile Profile()
         {
             var session_id = Request.Headers["Authorization"].ToString();
-            var session = c_sessions.Find(x => x.session_id == session_id).ToList().First();
-            var profile = c_profile.Find(x => x.user_id == session.user_id).ToList().First();
+            var session = host.c_sessions.Find(x => x.session_id == session_id).ToList().First();
+            var profile = host.c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
             return profile;
         }
