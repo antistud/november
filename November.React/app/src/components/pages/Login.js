@@ -9,6 +9,7 @@ export class Login extends Component {
   onSubmit = e => {
     e.preventDefault();
     this.props.authorize(this.state);
+
     this.setState({ username: "", password: "" });
   };
   render() {

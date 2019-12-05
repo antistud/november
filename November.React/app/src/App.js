@@ -41,31 +41,9 @@ class App extends Component {
     }
   }
 
-
   componentDidUpdate() {
     if (this.state.apiKey === null && localStorage.getItem("apiKey") !== null) {
       this.setState({ apiKey: localStorage.getItem("apiKey") });
-
-  componentDidMount() {
-    if (localStorage.getItem("apiKey") !== null) {
-      Game.getGames().then(data => {
-        console.log("games", data);
-      });
-      db.getGames(localStorage.getItem("apiKey")).then(response => {
-        const ids = response.data
-          .map(game => {
-            return game.atlas_id;
-          })
-          .toString();
-        searchGames(
-          "https://www.boardgameatlas.com/api/search?ids=" +
-            ids +
-            "&client_id=PaLV4upJP7"
-        ).then(gameData => {
-          this.setState({ gamelibrary: gameData.data.games });
-        });
-      });
-
     }
   }
 
