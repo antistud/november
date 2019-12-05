@@ -1,8 +1,16 @@
 import React, { Component } from "react";
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
+import db from "../services/db";
 
 export class AppNavbar extends Component {
-  // logout = (e, apiKey) => { db.logout(apiKey).then(res => { console.log(res); localStorage.removeItem('apiKey') }) }
+  logout = e => {
+    db.logout(this.props.apiKey).then(res => {
+      console.log(res);
+      localStorage.removeItem("apiKey");
+      this.props.loggedIn(false);
+    });
+  };
+
   loginbutton() {
     if (localStorage.getItem("apiKey") != null) {
       return (
@@ -21,12 +29,16 @@ export class AppNavbar extends Component {
             </Nav>
           </Navbar.Collapse>
           <Navbar.Collapse className="justify-content-end basic-navbar-nav">
-            {/* <NavDropdown title={this.props.username} id="basic-nav-dropdown">
-            <NavDropdown.Item href="/" >
-              Logout
-          </NavDropdown.Item>
-          </NavDropdown> */}
-            <Navbar.Text>{this.props.username}</Navbar.Text>
+            <Nav>
+              <NavDropdown title={this.props.username} id="basic-nav-dropdown">
+                <NavDropdown.Item onClick={() => this.logout()}>
+                  Logout
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+            {/* <Navbar.Text onClick={() => this.logout()}>
+              {this.props.username}
+            </Navbar.Text> */}
           </Navbar.Collapse>
         </React.Fragment>
       );

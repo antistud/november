@@ -15,7 +15,7 @@ export class GameInfo extends Component {
   };
   getLibraryIds = () => {
     if (this.props.gamelibrary != null) {
-      return this.props.gamelibrary.map(id => id.id);
+      return this.props.gamelibrary.map(id => id.atlas_id);
     } else {
       return [];
     }

@@ -4,18 +4,16 @@ import { Image } from "react-bootstrap";
 
 import "../App.css";
 export class GameLibrary extends Component {
-
-
   renderTableData() {
-    return this.props.gamelibrary.map(game => (
+    console.log("render table data: ", this.props);
+    return this.props.gamelibrary_atlas.map(game => (
       <tr>
-        <td>
-          <Image className="gameImage" src={game.images.small}></Image>
-        </td>
-        <td>{game.name}</td>
-        {/* <td>
-          <i className="fas fa-folder-plus fa-fw fa-3x"></i>
-        </td> */}
+        <React.Fragment>
+          <td>
+            <Image className="gameImage" src={game.images.small}></Image>
+          </td>
+          <td>{game.name}</td>
+        </React.Fragment>
       </tr>
     ));
   }
@@ -24,7 +22,7 @@ export class GameLibrary extends Component {
     if (this.props.gamelibrary !== null) {
       return (
         <React.Fragment>
-          <h2>{this.props.username}'s library</h2>
+          <h2>Your library</h2>
           <Table striped bordered hover>
             <thead>
               <tr>
