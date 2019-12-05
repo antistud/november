@@ -14,6 +14,7 @@ using MongoDB.Driver;
 using MongoDB.Driver.Builders;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using MongoDB.Bson.Serialization;
 
 namespace November.Dotnet.Controllers
 {
@@ -33,7 +34,7 @@ namespace November.Dotnet.Controllers
 
 
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery] bool atlas)
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
@@ -46,7 +47,27 @@ namespace November.Dotnet.Controllers
                 try
                 {
                     var docs = host.c_game.Find(x => x.user_id == profile.user_id).ToList();
-                    var json = JsonSerializer.Serialize(docs);
+                    var games = new List<UserGame>();
+                    foreach (var doc in docs)
+                    {
+                        if (atlas == true)
+                        {
+
+                            try
+                            {
+                                var cache = host.c_atlas.Find(x => x.atlas_id == doc.atlas_id).ToList().First().cache;
+                                doc.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
+
+                            }
+                            catch
+                            {
+                                var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + doc.atlas_id);
+                                doc.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                                host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = doc.atlas_id, cache = atlas_api });
+                            }
+                        }
+                        games.Add(doc);
+                    }
                     return Ok(docs);
                 }
                 catch
@@ -77,6 +98,17 @@ namespace November.Dotnet.Controllers
             }
             catch
             {
+
+                try
+                {
+                    var atlas_game = host.c_atlas.Find(x => x.atlas_id == body.atlas_id).ToList().First().cache;
+                }
+                catch
+                {
+                    var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + body.atlas_id);
+                    host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = body.atlas_id, cache = api });
+                }
+
                 var id = ObjectId.GenerateNewId().ToString();
                 host.c_game.InsertOneAsync(new UserGame { _id = id, atlas_id = body.atlas_id, user_id = profile.user_id });
                 return Ok(id.ToString());
@@ -141,7 +173,7 @@ namespace November.Dotnet.Controllers
 
         [Route("Friends")]
         [HttpGet]
-        public IActionResult GetFriendGames()
+        public IActionResult GetFriendGames([FromQuery] bool atlas)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
@@ -159,6 +191,22 @@ namespace November.Dotnet.Controllers
                 {
                     foreach (var g in q.game)
                     {
+                        if (atlas == true)
+                        {
+
+                            try
+                            {
+                                var cache = host.c_atlas.Find(x => x.atlas_id == g.atlas_id).ToList().First().cache;
+                                g.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
+
+                            }
+                            catch
+                            {
+                                var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + g.atlas_id);
+                                g.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                                host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = g.atlas_id, cache = atlas_api });
+                            }
+                        }
                         gamesls.Add(g);
                     }
 
@@ -185,17 +233,21 @@ namespace November.Dotnet.Controllers
                     var docs = host.c_game.Find(x => x._id == game_id).ToList().First();
                     if (atlas == true)
                     {
+
+                        var atlas_game = new AtlasGame();
                         try
                         {
+                            var cache = host.c_atlas.Find(x => x.atlas_id == docs.atlas_id).ToList().First().cache;
+                            docs.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
 
-                            var api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=PaLV4upJP7&ids=" + docs.atlas_id);
-                            // JsonConvert.DeserializeObject(api);
-                            docs.atlas = JsonSerializer.Deserialize<Object>(api);
                         }
                         catch
                         {
-
+                            var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + docs.atlas_id);
+                            docs.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                            host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = docs.atlas_id, cache = atlas_api });
                         }
+
                     }
                     if (play == true)
                     {
