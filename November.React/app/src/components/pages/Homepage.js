@@ -1,13 +1,11 @@
 import React, { Component } from "react";
 import GameLibrary from "../GameLibrary";
+
 export class Homepage extends Component {
   render() {
     return (
       <React.Fragment>
-        <GameLibrary
-          username={this.props.username}
-          gamelibrary={this.props.gamelibrary}
-        />
+        <GameLibrary gamelibrary_atlas={this.props.gamelibrary_atlas} />
       </React.Fragment>
     );
   }

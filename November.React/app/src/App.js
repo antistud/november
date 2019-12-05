@@ -1,16 +1,24 @@
 import React, { Component } from "react";
-import GameSearch from "./components/GameSearch";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Container } from "react-bootstrap";
 import "./App.css";
+
+import {
+  BrowserRouter as Router,
+  Route,
+  Redirect,
+  Switch
+} from "react-router-dom";
+
 import searchGames from "./services/SearchGames";
 import db from "./services/db";
 import Game from "./services/game";
 import AppNavbar from "./components/AppNavbar";
 import GameSearchBox from "./components/GameSearchBox";
-import { Container } from "react-bootstrap";
+import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
 import Login from "./components/pages/Login";
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -18,32 +26,26 @@ class App extends Component {
       apptitle: "BoxShare",
       games: [],
       gamelibrary: [],
-      username: "jfloth",
-      uderId: "1",
-      otherlibraries: [],
-      authorize: { username: "", password: "" }
+      gamelibrary_atlas: [],
+      apiKey: null,
+      loggedIn: false
     };
   }
-  isAuthed() {
+
+  componentDidMount() {
+    console.log("component did mount appjs");
+    this.getProfile();
+
     if (localStorage.getItem("apiKey") !== null) {
-      // console.log("apikey exists", localStorage.getItem("apiKey"));
-      return (
-        <Route exact path="/">
-          <Homepage
-            username={this.state.username}
-            gamelibrary={this.state.gamelibrary}
-          ></Homepage>
-        </Route>
-      );
-    } else {
-      // console.log("no apikey");
-      return (
-        <Route exact path="/">
-          <Login authorize={this.authorize}></Login>
-        </Route>
-      );
+      this.getGameLibrary();
     }
   }
+
+
+  componentDidUpdate() {
+    if (this.state.apiKey === null && localStorage.getItem("apiKey") !== null) {
+      this.setState({ apiKey: localStorage.getItem("apiKey") });
+
   componentDidMount() {
     if (localStorage.getItem("apiKey") !== null) {
       Game.getGames().then(data => {
@@ -63,20 +65,44 @@ class App extends Component {
           this.setState({ gamelibrary: gameData.data.games });
         });
       });
+
     }
-    //localStorage.clear();
-    //console.log(JSON.parse(localStorage.getItem("gamelibrary")));
   }
 
-  //toggle game availability
-  markAvailable = id => {
-    this.setState({
-      games: this.state.games.map(game => {
-        if (game.id === id) {
-          game.available = !game.available;
-        }
-        return game;
+  getProfile() {
+    db.getProfile(localStorage.getItem("apiKey"))
+      .then(profile => {
+        localStorage.setItem("profile", JSON.stringify(profile.data));
+        // console.log(profile);
       })
+      .catch(error => {
+        alert(error);
+      });
+  }
+  getAtlasInfo = () => {
+    const ids = this.state.gamelibrary
+      .map(game => {
+        return game.atlas_id;
+      })
+      .toString();
+
+    console.log("getAtlasInfo called: ", ids);
+    if (ids) {
+      searchGames(
+        "https://www.boardgameatlas.com/api/search?ids=" +
+          ids +
+          "&client_id=PaLV4upJP7"
+      ).then(gameData => {
+        console.log("gameData ");
+        this.setState({ gamelibrary_atlas: gameData.data.games });
+      });
+    }
+  };
+  getGameLibrary = () => {
+    console.log("getGameLibrary() called");
+    db.getGames(localStorage.getItem("apiKey")).then(response => {
+      this.setState({ gamelibrary: response.data });
+      this.getAtlasInfo();
     });
   };
 
@@ -86,38 +112,35 @@ class App extends Component {
         searchstring +
         "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
-      console.log(response.data.games);
       this.setState({
         games: response.data.games
       });
       return response.data.games;
     });
-
-    console.log(this.state.games);
   };
 
   authorize = body => {
-    db.login(body).then(response => {
-      console.log(response);
-      localStorage.setItem("apiKey", response.data);
-      db.getProfile(response.data).then(profile => {
-        localStorage.setItem("profile", JSON.stringify(profile.data));
-        console.log(profile);
+    db.login(body)
+      .then(response => {
+        if (response.data != "missing or wrong password") {
+          localStorage.setItem("apiKey", response.data);
+          this.setState({ apiKey: response.data });
+
+          this.getProfile();
+        } else {
+          alert("Credentials unrecognized. Please try again!");
+        }
+      })
+      .catch(error => {
+        localStorage.removeItem("apiKey");
+        alert("invalid credentials");
       });
-    });
-
-    console.log(this.state.apiKey);
   };
 
-  saveGame = game => {
-    var currentlist = JSON.parse(localStorage.getItem("gamelibrary")) || [];
-    currentlist.push(game);
-    console.log(JSON.parse(localStorage.getItem("gamelibrary")));
-    localStorage.setItem("gamelibrary", JSON.stringify(currentlist));
-    this.setState({
-      gamelibrary: JSON.parse(localStorage.getItem("gamelibrary"))
-    });
+  loggedIn = bool => {
+    this.setState({ loggedIn: bool });
   };
+
   render() {
     return (
       <Router>
@@ -130,31 +153,51 @@ class App extends Component {
             }
             apptitle={this.state.apptitle}
             apiKey={localStorage.getItem("apiKey")}
+            loggedIn={this.loggedIn}
           ></AppNavbar>
 
           <Container className="p-3">
-            <Route exact path="/">
-              {this.isAuthed()}
-            </Route>
-            <Route
-              exact
-              path="/gamesearch"
-              render={props => (
-                <React.Fragment>
-                  <GameSearchBox gameSearch={this.gameSearch} />
-                  <br />
-                  <GameSearch
-                    games={this.state.games}
-                    saveGame={this.saveGame}
-                    gamelibrary={this.state.gamelibrary}
-                  />
-                </React.Fragment>
-              )}
-            ></Route>
-            <Route path="/about" component={About}></Route>
-            <Route path="/login">
-              <Login authorize={this.authorize}></Login>
-            </Route>
+            <Switch>
+              <Route
+                exact
+                path="/"
+                render={() =>
+                  localStorage.getItem("apiKey") == null ? (
+                    <Redirect to="/login" />
+                  ) : (
+                    <Homepage
+                      gamelibrary_atlas={this.state.gamelibrary_atlas}
+                    ></Homepage>
+                  )
+                }
+              ></Route>
+              <Route
+                exact
+                path="/gamesearch"
+                render={props => (
+                  <React.Fragment>
+                    <GameSearchBox gameSearch={this.gameSearch} />
+                    <br />
+                    <GameSearch
+                      games={this.state.games}
+                      gamelibrary={this.state.gamelibrary}
+                      updategamelibrary={this.getGameLibrary}
+                    />
+                  </React.Fragment>
+                )}
+              ></Route>
+              <Route path="/about" component={About}></Route>
+              <Route
+                path="/login"
+                render={() =>
+                  localStorage.getItem("apiKey") !== null ? (
+                    <Redirect to="/" />
+                  ) : (
+                    <Login authorize={this.authorize}></Login>
+                  )
+                }
+              ></Route>
+            </Switch>
           </Container>
         </div>
       </Router>
