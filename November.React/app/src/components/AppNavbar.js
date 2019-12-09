@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 import { Navbar, Nav, NavDropdown } from "react-bootstrap";
-import db from "../services/db";
+import Auth from "../services/auth";
 
 export class AppNavbar extends Component {
   logout = e => {
-    db.logout(this.props.apiKey).then(res => {
+    Auth.logout(this.props.apiKey).then(res => {
       console.log(res);
       localStorage.removeItem("apiKey");
       this.props.loggedIn(false);
@@ -31,6 +31,7 @@ export class AppNavbar extends Component {
           <Navbar.Collapse className="justify-content-end basic-navbar-nav">
             <Nav>
               <NavDropdown title={this.props.username} id="basic-nav-dropdown">
+                <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => this.logout()}>
                   Logout
                 </NavDropdown.Item>

@@ -10,9 +10,12 @@ import {
 } from "react-router-dom";
 
 import searchGames from "./services/SearchGames";
-import db from "./services/db";
+
 import Game from "./services/game";
+import Auth from "./services/auth";
 import AppNavbar from "./components/AppNavbar";
+import Friends from "./components/pages/Friends";
+import Profile from "./components/pages/Profile";
 import GameSearchBox from "./components/GameSearchBox";
 import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
@@ -26,7 +29,7 @@ class App extends Component {
       apptitle: "BoxShare",
       games: [],
       gamelibrary: [],
-      gamelibrary_atlas: [],
+
       apiKey: null,
       loggedIn: false
     };
@@ -48,7 +51,7 @@ class App extends Component {
   }
 
   getProfile() {
-    db.getProfile(localStorage.getItem("apiKey"))
+    Auth.getProfile(localStorage.getItem("apiKey"))
       .then(profile => {
         localStorage.setItem("profile", JSON.stringify(profile.data));
         // console.log(profile);
@@ -57,30 +60,11 @@ class App extends Component {
         alert(error);
       });
   }
-  getAtlasInfo = () => {
-    const ids = this.state.gamelibrary
-      .map(game => {
-        return game.atlas_id;
-      })
-      .toString();
 
-    console.log("getAtlasInfo called: ", ids);
-    if (ids) {
-      searchGames(
-        "https://www.boardgameatlas.com/api/search?ids=" +
-          ids +
-          "&client_id=PaLV4upJP7"
-      ).then(gameData => {
-        console.log("gameData ");
-        this.setState({ gamelibrary_atlas: gameData.data.games });
-      });
-    }
-  };
   getGameLibrary = () => {
     console.log("getGameLibrary() called");
-    db.getGames(localStorage.getItem("apiKey")).then(response => {
+    Game.getGames(localStorage.getItem("apiKey")).then(response => {
       this.setState({ gamelibrary: response.data });
-      this.getAtlasInfo();
     });
   };
 
@@ -98,7 +82,7 @@ class App extends Component {
   };
 
   authorize = body => {
-    db.login(body)
+    Auth.login(body)
       .then(response => {
         if (response.data != "missing or wrong password") {
           localStorage.setItem("apiKey", response.data);
@@ -118,6 +102,9 @@ class App extends Component {
   loggedIn = bool => {
     this.setState({ loggedIn: bool });
   };
+
+  loginRedirect = (isAuthed, notAuthed) =>
+    localStorage.getItem("apiKey") !== null ? isAuthed : notAuthed;
 
   render() {
     return (
@@ -140,12 +127,26 @@ class App extends Component {
                 exact
                 path="/"
                 render={() =>
-                  localStorage.getItem("apiKey") == null ? (
+                  this.loginRedirect(
+                    <Homepage gamelibrary={this.state.gamelibrary}></Homepage>,
                     <Redirect to="/login" />
-                  ) : (
-                    <Homepage
-                      gamelibrary_atlas={this.state.gamelibrary_atlas}
-                    ></Homepage>
+                  )
+                }
+              ></Route>
+              <Route
+                path="/friends"
+                render={() =>
+                  this.loginRedirect(<Friends />, <Redirect to="/login" />)
+                }
+              ></Route>
+              <Route
+                path="/profile"
+                render={() =>
+                  this.loginRedirect(
+                    <Profile
+                      profile={JSON.parse(localStorage.getItem("profile"))}
+                    />,
+                    <Redirect to="/login" />
                   )
                 }
               ></Route>
@@ -168,9 +169,8 @@ class App extends Component {
               <Route
                 path="/login"
                 render={() =>
-                  localStorage.getItem("apiKey") !== null ? (
-                    <Redirect to="/" />
-                  ) : (
+                  this.loginRedirect(
+                    <Redirect to="/" />,
                     <Login authorize={this.authorize}></Login>
                   )
                 }

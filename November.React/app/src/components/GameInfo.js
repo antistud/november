@@ -3,7 +3,7 @@ import { Image } from "react-bootstrap";
 
 import "../App.css";
 
-import db from "../services/db";
+import Game from "../services/game";
 export class GameInfo extends Component {
   //Colors "add" icon based on whether or not it exists in library
   getIconStyle = gameId => {
@@ -24,7 +24,7 @@ export class GameInfo extends Component {
   saveGameCheck = gameId => {
     console.log("savegame executed");
     if (!this.getLibraryIds().includes(gameId)) {
-      db.addGame(localStorage.getItem("apiKey"), gameId)
+      Game.addGame(localStorage.getItem("apiKey"), gameId)
         .then(res => {
           this.props.updategamelibrary();
           if (res.status != 200) {

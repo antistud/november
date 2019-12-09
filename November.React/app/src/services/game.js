@@ -6,7 +6,9 @@ const Game = {
   auth_headers: db.auth_headers,
   headers: db.headers,
   getGames() {
-    return axios.get(this.host + "/Game", { headers: this.auth_headers });
+    return axios.get(this.host + "/Game?atlas=true", {
+      headers: this.auth_headers
+    });
   },
   getFriendsGames() {
     return axios.get(this.host + "/GameFriends", {
