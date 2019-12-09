@@ -4,18 +4,21 @@ import { Image } from "react-bootstrap";
 
 import "../App.css";
 export class GameLibrary extends Component {
-  renderTableData() {
-    console.log("render table data: ", this.props);
-    return this.props.gamelibrary_atlas.map(game => (
-      <tr>
-        <React.Fragment>
-          <td>
-            <Image className="gameImage" src={game.images.small}></Image>
-          </td>
-          <td>{game.name}</td>
-        </React.Fragment>
+  renderTableData(props) {
+    console.log("render table data: ", props);
+    const tableItems = props.gamelibrary.map(game => (
+      <tr key={game._id}>
+        <td key={game._id}>
+          <Image
+            key={game.atlas.images.small.toString()}
+            className="gameImage"
+            src={game.atlas.images.small}
+          ></Image>
+        </td>
+        <td key={game.atlas.id}>{game.atlas.name}</td>
       </tr>
     ));
+    return <tbody>{tableItems}</tbody>;
   }
 
   render() {
@@ -32,7 +35,11 @@ export class GameLibrary extends Component {
               </tr>
             </thead>
 
-            <tbody>{this.renderTableData()}</tbody>
+            {/* <tbody>{this.renderTableData()}</tbody> */}
+
+            <this.renderTableData
+              gamelibrary={this.props.gamelibrary}
+            ></this.renderTableData>
           </Table>
         </React.Fragment>
       );

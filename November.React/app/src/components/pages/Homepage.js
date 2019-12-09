@@ -5,7 +5,7 @@ export class Homepage extends Component {
   render() {
     return (
       <React.Fragment>
-        <GameLibrary gamelibrary_atlas={this.props.gamelibrary_atlas} />
+        <GameLibrary gamelibrary={this.props.gamelibrary} />
       </React.Fragment>
     );
   }
