@@ -21,6 +21,7 @@ import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
 import Login from "./components/pages/Login";
+import GamePage from "./components/pages/GamePage";
 
 class App extends Component {
   constructor(props) {
@@ -138,6 +139,10 @@ class App extends Component {
                 render={() =>
                   this.loginRedirect(<Friends />, <Redirect to="/login" />)
                 }
+              ></Route>
+              <Route
+                path="/game/:gameId"
+                render={() => <GamePage gameId={this.props.gameId} />}
               ></Route>
               <Route
                 path="/profile"
