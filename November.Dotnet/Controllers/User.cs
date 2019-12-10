@@ -63,6 +63,32 @@ namespace November.Dotnet.Controllers
             };
 
         }
+        [Route("All")]
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            if (CheckSessionId() != false)
+            {
+                var docs = new List<UserProfileSummary>();
+                var users = host.c_profile.Find(_ => true).ToList();
+                foreach(var user in users){
+                   var p = new  UserProfileSummary();
+                    p.user_id = user.user_id;
+                    p.username = user.username;
+                    p.name = user.name;
+                   docs.Add(p);
+                }
+                return Ok(docs);
+            }
+            else
+            {
+                return Ok("false");
+            };
+
+        }
         [Route("Friend/{id}")]
         [HttpPut]
         public IActionResult Put(string id)

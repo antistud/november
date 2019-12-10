@@ -30,7 +30,6 @@ class App extends Component {
       apptitle: "BoxShare",
       games: [],
       gamelibrary: [],
-
       apiKey: null,
       loggedIn: false
     };
@@ -140,10 +139,7 @@ class App extends Component {
                   this.loginRedirect(<Friends />, <Redirect to="/login" />)
                 }
               ></Route>
-              <Route
-                path="/game/:gameId"
-                render={() => <GamePage gameId={this.props.gameId} />}
-              ></Route>
+              <Route path="/game/:gameId" component={GamePage} />
               <Route
                 path="/profile"
                 render={() =>
