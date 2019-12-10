@@ -23,7 +23,7 @@ const Game = {
     );
   },
   getGameDetails(gameId) {
-    return axios.get(this.host + "/Game/" + gameId, {
+    return axios.get(this.host + "/Game/" + gameId + "?atlas=true", {
       headers: this.auth_headers
     });
   },

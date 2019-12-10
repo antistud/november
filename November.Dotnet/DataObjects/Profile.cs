@@ -21,4 +21,11 @@ namespace November.Dotnet
         public string state { get; set; }
         public string zip { get; set; }
     }
+    public class UserProfileSummary
+    {
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string user_id { get; set; }
+        public string username { get; set; }
+        public string name { get; set; }
+    }
 }

@@ -21,6 +21,7 @@ import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
 import Login from "./components/pages/Login";
+import GamePage from "./components/pages/GamePage";
 
 class App extends Component {
   constructor(props) {
@@ -29,7 +30,6 @@ class App extends Component {
       apptitle: "BoxShare",
       games: [],
       gamelibrary: [],
-
       apiKey: null,
       loggedIn: false
     };
@@ -139,6 +139,7 @@ class App extends Component {
                   this.loginRedirect(<Friends />, <Redirect to="/login" />)
                 }
               ></Route>
+              <Route path="/game/:gameId" component={GamePage} />
               <Route
                 path="/profile"
                 render={() =>
