@@ -5,7 +5,6 @@ import Auth from "../services/auth";
 export class AppNavbar extends Component {
   logout = e => {
     Auth.logout(this.props.apiKey).then(res => {
-      console.log(res);
       localStorage.removeItem("apiKey");
       this.props.loggedIn(false);
     });

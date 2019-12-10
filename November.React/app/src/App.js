@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Container } from "react-bootstrap";
 import "./App.css";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faUserCircle, faUserEdit } from "@fortawesome/free-solid-svg-icons";
 
 import {
   BrowserRouter as Router,
@@ -22,6 +24,7 @@ import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
 import Login from "./components/pages/Login";
 
+library.add(faUserCircle, faUserEdit);
 class App extends Component {
   constructor(props) {
     super(props);
@@ -101,6 +104,9 @@ class App extends Component {
 
   loggedIn = bool => {
     this.setState({ loggedIn: bool });
+    if (bool === false) {
+      this.setState({ gamelibrary: [] });
+    }
   };
 
   loginRedirect = (isAuthed, notAuthed) =>
@@ -141,6 +147,17 @@ class App extends Component {
               ></Route>
               <Route
                 path="/profile"
+                render={() =>
+                  this.loginRedirect(
+                    <Profile
+                      profile={JSON.parse(localStorage.getItem("profile"))}
+                    />,
+                    <Redirect to="/login" />
+                  )
+                }
+              ></Route>
+              <Route
+                path="/profile/edit"
                 render={() =>
                   this.loginRedirect(
                     <Profile
