@@ -253,7 +253,7 @@ namespace November.Dotnet.Controllers
                     {
                         try
                         {
-                            docs.play = host.c_play.Find(x => x.game_id == game_id).ToList().First();
+                            docs.play = host.c_play.Find(x => x.game_id == game_id).ToList();
                         }
                         catch
                         {
@@ -264,7 +264,7 @@ namespace November.Dotnet.Controllers
                     {
                         try
                         {
-                            docs.request = host.c_request.Find(x => x.game_id == game_id).ToList().First();
+                            docs.request = host.c_request.Find(x => x.game_id == game_id).ToList();
                         }
                         catch
                         {

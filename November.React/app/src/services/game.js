@@ -23,9 +23,12 @@ const Game = {
     );
   },
   getGameDetails(gameId) {
-    return axios.get(this.host + "/Game/" + gameId + "?atlas=true", {
-      headers: this.auth_headers
-    });
+    return axios.get(
+      this.host + "/Game/" + gameId + "?atlas=true&play=true&request=true",
+      {
+        headers: this.auth_headers
+      }
+    );
   },
   deleteGame(gameId) {
     return axios.delete(
