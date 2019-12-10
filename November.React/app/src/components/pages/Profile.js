@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import { Table, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ProfileEdit from "./ProfileEdit";
-
+import { useHistory, useRouteMatch } from "react-router-dom";
 function Profile(props) {
   const state = {
     name: null,
@@ -11,12 +10,12 @@ function Profile(props) {
     city: null,
     state: null
   };
-  let onChange = e => this.setState({ [e.target.name]: e.target.value });
-  let onSubmit = e => {
-    e.preventDefault();
-    this.props.gameSearch(this.state.searchstring);
-    this.setState({ searchstring: "" });
-  };
+
+  let history = useHistory();
+  let { url } = useRouteMatch();
+  function handleClick() {
+    history.push(`${url}/edit`);
+  }
   return (
     <React.Fragment>
       <div>
@@ -27,7 +26,7 @@ function Profile(props) {
           </span>
           <span style={{ float: "right" }}>
             <Button variant="primary">
-              <FontAwesomeIcon icon="user-edit" />
+              <FontAwesomeIcon icon="user-edit" onClick={handleClick} />
             </Button>
           </span>
         </h2>
@@ -45,7 +44,7 @@ function Profile(props) {
           <tr>
             <th>Address</th>
             <th>
-              {props.profile.address},{props.profile.city},{props.profile.state}
+              {props.profile.address}
             </th>
           </tr>
           <tr>

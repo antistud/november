@@ -22,6 +22,7 @@ import GameSearchBox from "./components/GameSearchBox";
 import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
+import ProfileEdit from "./components/pages/ProfileEdit"
 import Login from "./components/pages/Login";
 
 library.add(faUserCircle, faUserEdit);
@@ -74,8 +75,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-        searchstring +
-        "&limit=10&client_id=PaLV4upJP7"
+      searchstring +
+      "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       this.setState({
         games: response.data.games
@@ -146,10 +147,10 @@ class App extends Component {
                 }
               ></Route>
               <Route
-                path="/profile"
+                path="/profile/edit"
                 render={() =>
                   this.loginRedirect(
-                    <Profile
+                    <ProfileEdit
                       profile={JSON.parse(localStorage.getItem("profile"))}
                     />,
                     <Redirect to="/login" />
@@ -157,7 +158,7 @@ class App extends Component {
                 }
               ></Route>
               <Route
-                path="/profile/edit"
+                path="/profile"
                 render={() =>
                   this.loginRedirect(
                     <Profile
