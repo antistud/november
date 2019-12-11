@@ -5,14 +5,13 @@ import Game from "../../services/game";
   function GamePage(props) {
     const [game, setGame] = useState();
     let { gameId } = useParams();
+    
     useEffect(async () => {
        Game.getGameDetails(gameId).then(res => {
         setGame(res.data);    
     });
-
     }, []);
 
-  
   function createRequestsList() {
     let table = [];
     for (let j = 0; j < 5; j++) {
