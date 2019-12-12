@@ -18,7 +18,8 @@ a {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  width: 50%;
+  width: auto;
+  height: 70px;
 }
 
 .gameHeader {
@@ -32,7 +33,7 @@ a {
 }
 
 .gameDetails img{
-  height: 180px;
+  height: 280px;
   object-fit: cover;
   object-position: 0 10%;
 }

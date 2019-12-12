@@ -1,11 +1,12 @@
-import React, { Component,useEffect,useState } from "react";
-import { useRouteMatch, useParams } from "react-router-dom";
+import React, { Component,useEffect,useState} from "react";
+import { useHistory, useRouteMatch, useParams } from "react-router-dom";
 import Game from "../../services/game";
 
   function GamePage(props) {
-    const [game, setGame] = useState();
+    let history = useHistory();
+    let [game, setGame] = useState();
     let { gameId } = useParams();
-    
+    let { url } = useRouteMatch();
     useEffect(async () => {
        Game.getGameDetails(gameId).then(res => {
         setGame(res.data);    
@@ -20,7 +21,16 @@ import Game from "../../services/game";
     return table;
   };
 
-if(game){
+  function deleteGame(gameId) {
+    console.log(gameId)
+   
+    Game.deleteGame(gameId).then(res=>{
+      console.log("delete game",res.data)
+      window.location.replace("/")
+    })
+  }
+
+if(game && game.atlas){
   return (
       <div className="container">
         <div className="row">
@@ -52,7 +62,7 @@ if(game){
           </div> 
           
           <div className="col-sm">
-<a href="#" className="btn btn-block btn-danger mt-2"><i className="fa fa-trash"></i><br />Remove</a>
+<button onClick={() => deleteGame(game._id)} className="btn btn-block btn-danger mt-2"><i className="fa fa-trash"></i><br />Remove</button>
           </div>
           </div>
 

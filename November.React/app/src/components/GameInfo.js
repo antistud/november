@@ -24,7 +24,7 @@ export class GameInfo extends Component {
   saveGameCheck = gameId => {
     console.log("savegame executed");
     if (!this.getLibraryIds().includes(gameId)) {
-      Game.addGame(localStorage.getItem("apiKey"), gameId)
+      Game.addGame(gameId)
         .then(res => {
           this.props.updategamelibrary();
           if (res.status != 200) {

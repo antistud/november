@@ -33,8 +33,8 @@ const Game = {
   deleteGame(gameId) {
     return axios.delete(
       this.host + "/Game",
-      { _id: gameId },
       {
+        data: { _id: gameId },
         headers: this.auth_headers
       }
     );
