@@ -23,15 +23,18 @@ const Game = {
     );
   },
   getGameDetails(gameId) {
-    return axios.get(this.host + "/Game/" + gameId, {
-      headers: this.auth_headers
-    });
+    return axios.get(
+      this.host + "/Game/" + gameId + "?atlas=true&play=true&request=true",
+      {
+        headers: this.auth_headers
+      }
+    );
   },
   deleteGame(gameId) {
     return axios.delete(
       this.host + "/Game",
-      { _id: gameId },
       {
+        data: { _id: gameId },
         headers: this.auth_headers
       }
     );

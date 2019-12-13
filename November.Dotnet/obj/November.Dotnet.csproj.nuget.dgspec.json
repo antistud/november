@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\November.Dotnet.csproj": {}
+    "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/November.Dotnet.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\November.Dotnet.csproj": {
+    "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/November.Dotnet.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\November.Dotnet.csproj",
+        "projectUniqueName": "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/November.Dotnet.csproj",
         "projectName": "November.Dotnet",
-        "projectPath": "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\November.Dotnet.csproj",
-        "packagesPath": "C:\\Users\\jon\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jon\\Documents\\projects\\november\\November.Dotnet\\obj\\",
+        "projectPath": "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/November.Dotnet.csproj",
+        "packagesPath": "/Users/jonrhoades/.nuget/packages/",
+        "outputPath": "/Users/jonrhoades/Documents/projects/dotnet/november/November.Dotnet/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\jon\\AppData\\Roaming\\NuGet\\NuGet.Config"
+          "/Users/jonrhoades/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.0"
@@ -67,7 +67,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.0.100/RuntimeIdentifierGraph.json"
         }
       }
     }

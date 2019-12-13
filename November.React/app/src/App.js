@@ -24,6 +24,7 @@ import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
 import ProfileEdit from "./components/pages/ProfileEdit"
 import Login from "./components/pages/Login";
+import GamePage from "./components/pages/GamePage";
 
 library.add(faUserCircle, faUserEdit);
 class App extends Component {
@@ -33,7 +34,6 @@ class App extends Component {
       apptitle: "BoxShare",
       games: [],
       gamelibrary: [],
-
       apiKey: null,
       loggedIn: false
     };
@@ -116,7 +116,7 @@ class App extends Component {
   render() {
     return (
       <Router>
-        <div className="App">
+       <div className="App">
           <AppNavbar
             username={
               localStorage.getItem("profile")
@@ -146,6 +146,9 @@ class App extends Component {
                   this.loginRedirect(<Friends />, <Redirect to="/login" />)
                 }
               ></Route>
+              <Route path="/game/:gameId" >
+                <GamePage ></GamePage>
+              </Route>
               <Route
                 path="/profile/edit"
                 render={() =>
