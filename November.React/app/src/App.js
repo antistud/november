@@ -66,9 +66,17 @@ class App extends Component {
   }
 
   getGameLibrary = () => {
-    console.log("getGameLibrary() called");
-    Game.getGames(localStorage.getItem("apiKey")).then(response => {
-      this.setState({ gamelibrary: response.data });
+    var games = [];
+    Game.getGames().then(response => {
+      for (let g in response.data) {
+        games.push(response.data[g]);
+      }
+      Game.getFriendsGames().then(response2 => {
+        for (let g2 in response2.data) {
+          games.push(response2.data[g2]);
+        }
+        this.setState({ gamelibrary: games });
+      });
     });
   };
 
