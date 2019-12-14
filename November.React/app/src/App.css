@@ -26,20 +26,27 @@ a {
   color: blue;
 }
 
-.loading{
+.loading {
   text-align: center;
-  padding-top:50px;
+  padding-top: 50px;
   font-size: x-large;
 }
 
-.gameDetails img{
+.gameDetails img {
   height: 280px;
   object-fit: cover;
   object-position: 0 10%;
 }
 
-.card{
-  margin-bottom:10px;
-  margin-top:10px;
+.card {
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
+.item {
+  width: 100%;
+  padding: 8px;
+  border: 2px rgb(94, 93, 93) solid;
+  border-radius: 4px;
+  font-weight: 100 !important;
+}

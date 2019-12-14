@@ -146,9 +146,10 @@ class App extends Component {
                   this.loginRedirect(<Friends />, <Redirect to="/login" />)
                 }
               ></Route>
-              <Route path="/game/:gameId" >
-                <GamePage ></GamePage>
+              <Route path="/game/:gameId">
+                <GamePage></GamePage>
               </Route>
+
               <Route
                 path="/profile/edit"
                 render={() =>
