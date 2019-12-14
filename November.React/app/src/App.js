@@ -109,7 +109,7 @@ class App extends Component {
   render() {
     return (
       <Router>
-       <div className="App">
+        <div className="App">
           <AppNavbar
             username={
               localStorage.getItem("profile")
@@ -139,9 +139,10 @@ class App extends Component {
                   this.loginRedirect(<Friends />, <Redirect to="/login" />)
                 }
               ></Route>
-              <Route path="/game/:gameId" >
-                <GamePage ></GamePage>
+              <Route path="/game/:gameId">
+                <GamePage></GamePage>
               </Route>
+
               <Route
                 path="/profile"
                 render={() =>

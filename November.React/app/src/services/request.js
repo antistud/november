@@ -54,7 +54,7 @@ const Request = {
   markReturnAsRecieved(requestId) {
     return axios.post(
       this.host + "/Request/" + requestId,
-      { step: "return_received" },
+      { step: "return_recieved" },
       {
         headers: this.auth_headers
       }
