@@ -1,27 +1,64 @@
-import React, { Component } from "react";
-import { Table } from "react-bootstrap";
+import React, { Component, useEffect, useState } from "react";
+import { Table, Button } from "react-bootstrap";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useHistory, useRouteMatch } from "react-router-dom";
+import User from "../../services/user"
+function Profile(props) {
+  let [profile, setProfile] = useState();
 
-export class Profile extends Component {
-  render() {
+  useEffect(() => {
+    console.log(profile)
+
+    User.getProfile().then(res => { console.log(res); setProfile(res.data) })
+
+    console.log('useEffect invoked');
+
+  }, []);
+  let history = useHistory();
+  let { url } = useRouteMatch();
+  function handleClick() {
+    history.push(`${url}/edit`);
+  }
+  if (profile) {
+
     return (
       <React.Fragment>
-        <h2>{this.props.profile.name}</h2>
+        <div>
+          <h2>
+            <span>
+              <FontAwesomeIcon icon="user-circle" />
+              {profile.name}
+            </span>
+            <span style={{ float: "right" }}>
+              <Button variant="primary">
+                <FontAwesomeIcon icon="user-edit" onClick={handleClick} />
+              </Button>
+            </span>
+          </h2>
+        </div>
         <Table striped bordered>
           <thead>
             <tr>
               <th>Username</th>
-              <th>{this.props.profile.username}</th>
+              <th>{profile.username}</th>
             </tr>
             <tr>
               <th>Email</th>
-              <th>{this.props.profile.email}</th>
+              <th>{profile.email}</th>
             </tr>
             <tr>
               <th>Address</th>
               <th>
-                {this.props.profile.address},{this.props.profile.city},
-                {this.props.profile.state}
+                {profile.address}
               </th>
+            </tr>
+            <tr>
+              <th>City</th>
+              <th>{profile.city}</th>
+            </tr>
+            <tr>
+              <th>State</th>
+              <th>{profile.state}</th>
             </tr>
           </thead>
 
@@ -30,6 +67,12 @@ export class Profile extends Component {
       </React.Fragment>
     );
   }
+  else {
+    return (
+      <div>Loading...</div>
+    )
+  }
+
 }
 
 export default Profile;
