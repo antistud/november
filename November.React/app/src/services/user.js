@@ -17,7 +17,14 @@ const User = {
     return axios.put(this.host + "/User/Friend/" + friendId, "", {
       headers: this.auth_headers
     });
-  }
+  },
+  updateProfile(body) {
+    return axios.post(
+      this.host + "/User",
+      body,
+      { headers: this.auth_headers }
+    );
+  },
 };
 
 export default User;
