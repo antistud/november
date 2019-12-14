@@ -70,7 +70,7 @@ function GamePage(props) {
           className="btn btn-block btn-success"
           onClick={() => markStep("rr", r.item._id)}
         >
-          Recieve
+          Recieved Back
         </button>
       );
     }
@@ -93,7 +93,7 @@ function GamePage(props) {
           className="btn btn-block btn-success"
           onClick={() => markStep("rs", r.item._id)}
         >
-          Send
+          Send Back
         </button>
       );
     }
@@ -118,7 +118,7 @@ function GamePage(props) {
           className="btn btn-block btn-success"
           onClick={() => markStep("sr", r.item._id)}
         >
-          Recieve
+          Recieved Game
         </button>
       );
     }
@@ -132,13 +132,13 @@ function GamePage(props) {
           title={"Sent: " + moment(r.item.send_sent, "YYYYMMDD").fromNow()}
         ></i>
       );
-    } else if (r.item.user_id !== game.user_id) {
+    } else if (r.item.user_id === game.user_id) {
       button = (
         <button
           className="btn btn-block btn-success"
           onClick={() => markStep("ss", r.item._id)}
         >
-          Send
+          Send Out
         </button>
       );
     }
@@ -175,6 +175,12 @@ function GamePage(props) {
   function GamePlayItem(p) {
     return <div>Play: {p.user_name}</div>;
   }
+  function handleNewRequestClick() {
+    Request.addRequest(gameId).then(res => {
+      console.log("request return", res.data);
+      getGame();
+    });
+  }
 
   function deleteGame(gameId) {
     console.log(gameId);
@@ -189,9 +195,13 @@ function GamePage(props) {
     if (game.user_id !== JSON.parse(localStorage.getItem("profile")).user_id) {
       return (
         <div className="col-sm">
-          <a href="#" className="btn btn-block btn-primary mt-2">
+          <a
+            href="#"
+            className="btn btn-block btn-primary mt-2"
+            onClick={() => handleNewRequestClick()}
+          >
             <i className="fa fa-share-square"></i>
-            <br /> Add Request
+            <br /> Request This Game
           </a>
         </div>
       );
