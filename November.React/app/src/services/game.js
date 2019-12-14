@@ -11,7 +11,7 @@ const Game = {
     });
   },
   getFriendsGames() {
-    return axios.get(this.host + "/GameFriends", {
+    return axios.get(this.host + "/Game/Friends?atlas=true", {
       headers: this.auth_headers
     });
   },
@@ -31,13 +31,10 @@ const Game = {
     );
   },
   deleteGame(gameId) {
-    return axios.delete(
-      this.host + "/Game",
-      {
-        data: { _id: gameId },
-        headers: this.auth_headers
-      }
-    );
+    return axios.delete(this.host + "/Game", {
+      data: { _id: gameId },
+      headers: this.auth_headers
+    });
   }
 };
 
