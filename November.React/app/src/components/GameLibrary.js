@@ -24,7 +24,7 @@ export class GameLibrary extends Component {
         </td>
         <td key={game.atlas.id}>
           <a href={"/Game/" + game._id}>
-          {game.atlas.name}
+            {game.atlas.name}
           </a>
         </td>
       </tr>
@@ -37,11 +37,11 @@ export class GameLibrary extends Component {
       return (
         <React.Fragment>
           <h2>Your library</h2>
-          
+
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th><a href="/gamesearch" className="btn btn-block "><i   className="fa fa-folder-plus fa-fw fa-2x"></i></a></th>
+                <th><a href="/gamesearch" className="btn btn-block "><i className="fa fa-folder-plus fa-fw fa-2x"></i></a></th>
                 <th>Name</th>
                 {/* <th></th> */}
               </tr>
@@ -56,7 +56,7 @@ export class GameLibrary extends Component {
         </React.Fragment>
       );
     } else {
-      return null;
+      return <div>Loading...</div>;
     }
   }
 }
