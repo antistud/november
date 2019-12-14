@@ -1,6 +1,8 @@
 import React, { Component } from "react";
 import { Container } from "react-bootstrap";
 import "./App.css";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faUserCircle, faUserEdit } from "@fortawesome/free-solid-svg-icons";
 
 import {
   BrowserRouter as Router,
@@ -20,9 +22,11 @@ import GameSearchBox from "./components/GameSearchBox";
 import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
+import ProfileEdit from "./components/pages/ProfileEdit"
 import Login from "./components/pages/Login";
 import GamePage from "./components/pages/GamePage";
 
+library.add(faUserCircle, faUserEdit);
 class App extends Component {
   constructor(props) {
     super(props);
@@ -79,8 +83,8 @@ class App extends Component {
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-        searchstring +
-        "&limit=10&client_id=PaLV4upJP7"
+      searchstring +
+      "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       this.setState({
         games: response.data.games
@@ -109,6 +113,9 @@ class App extends Component {
 
   loggedIn = bool => {
     this.setState({ loggedIn: bool });
+    if (bool === false) {
+      this.setState({ gamelibrary: [] });
+    }
   };
 
   loginRedirect = (isAuthed, notAuthed) =>
@@ -151,6 +158,17 @@ class App extends Component {
                 <GamePage></GamePage>
               </Route>
 
+              <Route
+                path="/profile/edit"
+                render={() =>
+                  this.loginRedirect(
+                    <ProfileEdit
+                      profile={JSON.parse(localStorage.getItem("profile"))}
+                    />,
+                    <Redirect to="/login" />
+                  )
+                }
+              ></Route>
               <Route
                 path="/profile"
                 render={() =>

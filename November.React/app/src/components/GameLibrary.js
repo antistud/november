@@ -80,7 +80,7 @@ export class GameLibrary extends Component {
         </React.Fragment>
       );
     } else {
-      return null;
+      return <div>Loading...</div>;
     }
   }
 }
