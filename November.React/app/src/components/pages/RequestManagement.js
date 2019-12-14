@@ -11,11 +11,6 @@ function RequestManagement() {
             console.log(res);
             setState({ requests: res.data });
         })
-
-
-
-        console.log('useEffect invoked');
-
     }, []);
     if (state) {
         let games = state.requests.map(request => (
