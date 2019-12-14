@@ -1,11 +1,10 @@
-import React, { Component, useEffect, useState } from "react";
-import { Table, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Col, InputGroup } from "react-bootstrap";
 import { useHistory, useRouteMatch } from "react-router-dom";
 import * as yup from "yup"
 import { Formik } from "formik"
 import User from "../../services/user"
-function ProfileEdit(props) {
+function ProfileEdit() {
   let [profile, setProfile] = useState();
 
   useEffect(() => {
@@ -17,13 +16,11 @@ function ProfileEdit(props) {
   }, []);
 
   let history = useHistory();
-  let { url } = useRouteMatch();
-  function handleClick() {
-    history.push(`/profile`);
-  }
+  // let { url } = useRouteMatch();
+
   function submitProfile(body) {
     User.updateProfile(body).then(res => {
-      if (res.data == 'Success' && res.status == 200) {
+      if (res.data === 'Success' && res.status === 200) {
         alert('Profile Updated!')
         history.push('/profile')
       }
