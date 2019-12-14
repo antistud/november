@@ -1,9 +1,9 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 
-export class Friends extends Component {
-  render() {
-    return <div></div>;
-  }
+function Friends() {
+
+  return <div></div>;
+
 }
 
 export default Friends;

@@ -25,6 +25,7 @@ import Homepage from "./components/pages/Homepage";
 import ProfileEdit from "./components/pages/ProfileEdit"
 import Login from "./components/pages/Login";
 import GamePage from "./components/pages/GamePage";
+import RequestManagement from "./components/pages/RequestManagement"
 
 library.add(faUserCircle, faUserEdit);
 class App extends Component {
@@ -96,7 +97,7 @@ class App extends Component {
   authorize = body => {
     Auth.login(body)
       .then(response => {
-        if (response.data != "missing or wrong password") {
+        if (response.data !== "missing or wrong password") {
           localStorage.setItem("apiKey", response.data);
           this.setState({ apiKey: response.data });
 
@@ -176,6 +177,16 @@ class App extends Component {
                     <Profile
                       profile={JSON.parse(localStorage.getItem("profile"))}
                     />,
+                    <Redirect to="/login" />
+                  )
+                }
+              ></Route>
+              <Route
+                exact
+                path="/requests"
+                render={() =>
+                  this.loginRedirect(
+                    <RequestManagement></RequestManagement>,
                     <Redirect to="/login" />
                   )
                 }
