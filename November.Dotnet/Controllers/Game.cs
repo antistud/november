@@ -253,7 +253,28 @@ namespace November.Dotnet.Controllers
                     {
                         try
                         {
-                            docs.play = host.c_play.Find(x => x.game_id == game_id).ToList();
+                          var playReturn = from q_play in host.c_play.AsQueryable()
+                                            join q_profile in host.c_profile.AsQueryable() on
+                                            q_play.user_id equals q_profile.user_id into q_profile
+                                    
+                                            select new { q_play, q_profile }; 
+                                
+                                List<GamePlayDetail> playls = new List<GamePlayDetail>();
+                                
+                                foreach(var r in playReturn){
+                                    if(r.q_play.game_id == game_id){
+                                      var req = new GamePlayDetail(r.q_play);
+                                    try{
+                                        var user = r.q_profile.ToList().First();
+                                        req.user_username = user.username; 
+                                        req.user_name = user.name; 
+                                    }catch{
+                                    } 
+                                    playls.Add(req); 
+                                    }
+                                    
+                                }
+                            docs.play = playls;
                         }
                         catch
                         {
@@ -264,7 +285,29 @@ namespace November.Dotnet.Controllers
                     {
                         try
                         {
-                            docs.request = host.c_request.Find(x => x.game_id == game_id).ToList();
+                           // host.c_request.Find(x => x.game_id == game_id).ToList();
+                          var requestReturn = from q_request in host.c_request.AsQueryable()
+                                            join q_profile in host.c_profile.AsQueryable() on
+                                            q_request.user_id equals q_profile.user_id into q_profile
+                                    
+                                            select new { q_request, q_profile }; 
+                                
+                                List<GameRequestDetail> requestls = new List<GameRequestDetail>();
+                                
+                                foreach(var r in requestReturn){
+                                    if(r.q_request.game_id == game_id){
+                                      var req = new GameRequestDetail(r.q_request);
+                                    try{
+                                        var user = r.q_profile.ToList().First();
+                                        req.user_username = user.username; 
+                                        req.user_name = user.name; 
+                                    }catch{
+                                    } 
+                                    requestls.Add(req); 
+                                    }
+                                    
+                                }
+                            docs.request = requestls;
                         }
                         catch
                         {
