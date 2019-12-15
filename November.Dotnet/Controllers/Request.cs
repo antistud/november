@@ -4,12 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Builders;
-using Newtonsoft.Json;
+// using Newtonsoft.Json;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 
@@ -56,6 +57,10 @@ namespace November.Dotnet.Controllers
                 {
                     if (g.request.user_id == profile.user_id)
                     {
+                        // let req = new GameRequest(g.request);
+                        // req.game_name = g.game.
+                        g.request.user = GetProfile(g.request.user_id);
+                        g.request.game = GetGame(g.game.First().atlas_id);
                         gamesls.Add(g.request);
                     }
                     else
@@ -64,6 +69,8 @@ namespace November.Dotnet.Controllers
                         {
                             if (g.game.First().user_id == profile.user_id)
                             {
+                                g.request.user = GetProfile(g.request.user_id);
+                                g.request.game = GetGame(g.game.First().atlas_id);
                                 gamesls.Add(g.request);
                             }
                         }
@@ -71,6 +78,7 @@ namespace November.Dotnet.Controllers
 
                     }
                 }
+
                 return Ok(gamesls);
 
 
@@ -206,6 +214,18 @@ namespace November.Dotnet.Controllers
             var profile = host.c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
             return profile;
+        }
+
+        UserProfile GetProfile(string user_id)
+        {
+            return host.c_profile.Find(x => x.user_id == user_id).ToList().First();
+        }
+        AtlasGame GetGame(string atlas_id)
+        {
+            var atlas = host.c_atlas.Find(x => x.atlas_id == atlas_id).ToList().First();
+            atlas.data = JsonSerializer.Deserialize<AtlasEndpoint>(atlas.cache).games.First();
+            atlas.cache = null;
+            return atlas;
         }
     }
 }
