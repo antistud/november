@@ -62,7 +62,7 @@ function GamePage(props) {
         ></i>
       );
     } else if (
-      r.item.user_id !== game.user_id &&
+      game.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
       r.item.return_sent !== "0001-01-01T00:00:00Z"
     ) {
       button = (
@@ -85,7 +85,7 @@ function GamePage(props) {
         ></i>
       );
     } else if (
-      r.item.user_id === game.user_id &&
+      r.item.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
       r.item.send_recieved !== "0001-01-01T00:00:00Z"
     ) {
       button = (
@@ -110,7 +110,7 @@ function GamePage(props) {
         ></i>
       );
     } else if (
-      r.item.user_id === game.user_id &&
+      r.item.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
       r.item.send_sent !== "0001-01-01T00:00:00Z"
     ) {
       button = (
@@ -132,7 +132,9 @@ function GamePage(props) {
           title={"Sent: " + moment(r.item.send_sent, "YYYYMMDD").fromNow()}
         ></i>
       );
-    } else if (r.item.user_id === game.user_id) {
+    } else if (
+      JSON.parse(localStorage.getItem("profile")).user_id === game.user_id
+    ) {
       button = (
         <button
           className="btn btn-block btn-success"
