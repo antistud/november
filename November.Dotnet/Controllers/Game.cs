@@ -145,12 +145,12 @@ namespace November.Dotnet.Controllers
                 var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
                 host.c_game.UpdateOneAsync(filter, update);
             }
-
-
+            if (body.status != 0)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.status, body.status);
+                host.c_game.UpdateOneAsync(filter, update);
+            }
             return Ok("success");
-
-
-
         }
         [HttpDelete]
         public IActionResult Delete([FromBody] UserGamePost body)

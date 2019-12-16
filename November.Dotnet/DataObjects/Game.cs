@@ -18,6 +18,7 @@ namespace November.Dotnet
         public Object atlas { get; set; }
         public List<GamePlayDetail> play { get; set; }
         public List<GameRequestDetail> request { get; set; }
+        public int status {get; set;}
 
     }
     public class UserGamePost
@@ -27,6 +28,7 @@ namespace November.Dotnet
         public string atlas_id { get; set; }
         public string bgg_id { get; set; }
         public bool favorite { get; set; }
+        public int status {get; set;}
 
     }
 }

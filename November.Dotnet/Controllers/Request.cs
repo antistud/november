@@ -59,8 +59,15 @@ namespace November.Dotnet.Controllers
                     {
                         // let req = new GameRequest(g.request);
                         // req.game_name = g.game.
-                        g.request.user = GetProfile(g.request.user_id);
-                        g.request.game = GetGame(g.game.First().atlas_id);
+                        try{
+                            g.request.user = GetProfile(g.request.user_id);
+                        }catch{
+                        }
+                
+                        try{
+                            g.request.game = GetGame(g.game.First().atlas_id);
+                        }catch{
+                        }
                         gamesls.Add(g.request);
                     }
                     else
@@ -69,8 +76,15 @@ namespace November.Dotnet.Controllers
                         {
                             if (g.game.First().user_id == profile.user_id)
                             {
-                                g.request.user = GetProfile(g.request.user_id);
-                                g.request.game = GetGame(g.game.First().atlas_id);
+                                  try{
+                            g.request.user = GetProfile(g.request.user_id);
+                        }catch{
+                        }
+                
+                        try{
+                            g.request.game = GetGame(g.game.First().atlas_id);
+                        }catch{
+                        }
                                 gamesls.Add(g.request);
                             }
                         }
@@ -154,6 +168,12 @@ namespace November.Dotnet.Controllers
                 var update = Builders<GameRequest>.Update.Set(x => x.lender_rating, body.lender_rating);
                 host.c_request.UpdateOneAsync(filter, update);
             }
+              if (body.status != 0)
+            {
+                var update = Builders<GameRequest>.Update.Set(x => x.status, body.status);
+                host.c_request.UpdateOneAsync(filter, update);
+            }
+             
 
             return Ok("success");
 
