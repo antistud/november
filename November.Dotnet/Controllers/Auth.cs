@@ -50,22 +50,46 @@ namespace November.Dotnet.Controllers
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
+              if (CheckSessionId() != false)
+            {
             try
             {
-                var user = host.c_auth.Find(x => x._id == body._id).ToList().First();
-                var filter = Builders<User>.Filter.Eq(x => x._id, body._id);
+                var profile = Profile();
+                var user = host.c_auth.Find(x => x._id == profile.user_id).ToList().First();
+                var filter = Builders<User>.Filter.Eq(x => x._id, profile.user_id);
                 if(user.hash == UserPassword.HashPassword(body.password)){
-                    var update = Builders<User>.Update.Set(x => x.hash, UserPassword.HashPassword(body.newpassword));
-                    host.c_auth.UpdateOneAsync(filter, update);
-                    return Ok("password updated");
+                    try{
+                            var passwordRegex = @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
+                            Regex rgx = new Regex(passwordRegex);
+                        if(rgx.IsMatch(body.newpassword) == true){
+
+                       
+                        var update = Builders<User>.Update.Set(x => x.hash, UserPassword.HashPassword(body.newpassword));
+                        host.c_auth.UpdateOneAsync(filter, update);
+                        try{
+                        host.c_sessions.DeleteMany(a => a.user_id == profile.user_id);
+                        }catch{
+
+                        }
+                        
+                        return Ok("password updated");  
+                        }else{
+                            return Ok($"does not match REGEX:  {passwordRegex}");
+                        }
+                    }catch{
+                        return Ok("password not updated");
+                    }
+                    
                 }else{
-                    return Ok("password not updated");
+                    return Ok("password does not match");
                 }
             }
             catch
             {
-                host.c_auth.InsertOneAsync(new User { username = body.username });
                 return Ok("User does not exist");
+            }
+            }else{
+                return Ok("missing or wrong session id");
             }
 
         }
