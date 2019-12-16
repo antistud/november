@@ -41,6 +41,33 @@ namespace November.Dotnet.Controllers
                 return Ok("false");
             };
 
+        }  
+        [HttpPut]
+        [Route("Reset")]
+        public IActionResult PutReset([FromBody] UserPutReset body)
+        {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+            try
+            {
+                var user = host.c_auth.Find(x => x._id == body._id).ToList().First();
+                var filter = Builders<User>.Filter.Eq(x => x._id, body._id);
+                if(user.hash == UserPassword.HashPassword(body.password)){
+                    var update = Builders<User>.Update.Set(x => x.hash, UserPassword.HashPassword(body.newpassword));
+                    host.c_auth.UpdateOneAsync(filter, update);
+                    return Ok("password updated");
+                }else{
+                    return Ok("password not updated");
+                }
+            }
+            catch
+            {
+                host.c_auth.InsertOneAsync(new User { username = body.username });
+                return Ok("User does not exist");
+            }
+
         }
         [HttpPut]
         public IActionResult Put([FromBody] UserPut body)
@@ -80,26 +107,7 @@ namespace November.Dotnet.Controllers
             }
 
         }
-        [HttpPut]
-        [Route("Reset")]
-        public IActionResult PutReset([FromBody] User body)
-        {
 
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            Response.Headers.Add("Content-Type", "application/json");
-            try
-            {
-                host.c_auth.Find(x => x.username == body.username).ToList().First();
-                return Ok("user already exists");
-            }
-            catch
-            {
-                host.c_auth.InsertOneAsync(new User { username = body.username });
-                return Ok("success");
-            }
-
-        }
         [HttpPost]
         public IActionResult Post([FromBody] User body)
         {
@@ -129,6 +137,7 @@ namespace November.Dotnet.Controllers
             }
 
         }
+        
         [HttpPatch]
         public IActionResult Patch([FromBody] User body)
         {
