@@ -160,48 +160,63 @@ namespace November.Dotnet.Controllers
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
-            if (CheckSessionId() != false)
+            try
             {
-                var profile = Profile();
-                var filter = Builders<UserProfile>.Filter.Eq(x => x.user_id, profile.user_id);
-
-                if (body.name != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.name, body.name);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.email != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.email, body.email);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.phone != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.phone, body.phone);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.address != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.address, body.address);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.city != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.city, body.city);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.state != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.state, body.state);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.zip != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.zip, body.zip);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
+                host.c_profile.Find(x => x.username == body.username && x.user_id != body.user_id).ToList().First();
+                return Ok("Username Already Exists");
             }
-            return Ok("Success");
+            catch
+            {
+                if (CheckSessionId() != false)
+                {
+                    var profile = Profile();
+                    var filter = Builders<UserProfile>.Filter.Eq(x => x.user_id, profile.user_id);
+
+                    if (body.name != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.name, body.name);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.email != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.email, body.email);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.username != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.username, body.username);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.phone != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.phone, body.phone);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.address != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.address, body.address);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.city != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.city, body.city);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.state != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.state, body.state);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.zip != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.zip, body.zip);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                }
+                return Ok("Success");
+
+            }
+
 
         }
         [HttpDelete]

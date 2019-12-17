@@ -10,18 +10,24 @@ function Friends() {
 
   useEffect(() => {
     getFriends();
-    getUsers();
   }, []);
 
   function getFriends() {
     User.getFriends().then(res => {
       setFriends(res.data);
       console.log("Friends", res.data);
+      getUsers();
     });
   }
   function getUsers() {
     User.getUsers().then(res => {
-      setUsers(res.data);
+      let users = [];
+      for (let u of res.data) {
+        if (u.user_id !== JSON.parse(localStorage.getItem("profile")).user_id) {
+          users.push(u);
+        }
+      }
+      setUsers(users);
       console.log("Users", res.data);
     });
   }
@@ -103,6 +109,10 @@ function Friends() {
             allowNew
             newSelectionPrefix="Invite With Email: "
             labelKey="name"
+            renderMenuItemChildren={(option, props, index) => {
+              return "@" + option.username + " - " + option.name;
+            }}
+            filterBy={["name", "username"]}
             options={users}
             value={invite}
             placeholder="Choose a friend..."
