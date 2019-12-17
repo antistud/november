@@ -40,4 +40,10 @@ namespace November.Dotnet
         public string url { get; set; }
     }
 
+     public class UserPutReset
+    {
+        public string password { get; set; }
+        public string newpassword {get; set;}
+    }
+
 }

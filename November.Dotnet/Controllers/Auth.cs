@@ -41,6 +41,57 @@ namespace November.Dotnet.Controllers
                 return Ok("false");
             };
 
+        }  
+        [HttpPut]
+        [Route("Reset")]
+        public IActionResult PutReset([FromBody] UserPutReset body)
+        {
+
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Headers", "*");
+            Response.Headers.Add("Content-Type", "application/json");
+              if (CheckSessionId() != false)
+            {
+            try
+            {
+                var profile = Profile();
+                var user = host.c_auth.Find(x => x._id == profile.user_id).ToList().First();
+                var filter = Builders<User>.Filter.Eq(x => x._id, profile.user_id);
+                if(user.hash == UserPassword.HashPassword(body.password)){
+                    try{
+                            var passwordRegex = @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
+                            Regex rgx = new Regex(passwordRegex);
+                        if(rgx.IsMatch(body.newpassword) == true){
+
+                       
+                        var update = Builders<User>.Update.Set(x => x.hash, UserPassword.HashPassword(body.newpassword));
+                        host.c_auth.UpdateOneAsync(filter, update);
+                        try{
+                        host.c_sessions.DeleteMany(a => a.user_id == profile.user_id);
+                        }catch{
+
+                        }
+                        
+                        return Ok("password updated");  
+                        }else{
+                            return Ok($"does not match REGEX:  {passwordRegex}");
+                        }
+                    }catch{
+                        return Ok("password not updated");
+                    }
+                    
+                }else{
+                    return Ok("password does not match");
+                }
+            }
+            catch
+            {
+                return Ok("User does not exist");
+            }
+            }else{
+                return Ok("missing or wrong session id");
+            }
+
         }
         [HttpPut]
         public IActionResult Put([FromBody] UserPut body)
@@ -56,7 +107,7 @@ namespace November.Dotnet.Controllers
                 try
                 {
                     var docs = host.c_auth.Find(x => x.username == body.email).ToList().First();
-                    return Ok("User Already Added");
+                    return Ok("User Already Exists");
                 }
                 catch
                 {
@@ -80,26 +131,7 @@ namespace November.Dotnet.Controllers
             }
 
         }
-        [HttpPut]
-        [Route("Reset")]
-        public IActionResult PutReset([FromBody] User body)
-        {
 
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            Response.Headers.Add("Content-Type", "application/json");
-            try
-            {
-                host.c_auth.Find(x => x.username == body.username).ToList().First();
-                return Ok("user already exists");
-            }
-            catch
-            {
-                host.c_auth.InsertOneAsync(new User { username = body.username });
-                return Ok("success");
-            }
-
-        }
         [HttpPost]
         public IActionResult Post([FromBody] User body)
         {
@@ -129,6 +161,7 @@ namespace November.Dotnet.Controllers
             }
 
         }
+        
         [HttpPatch]
         public IActionResult Patch([FromBody] User body)
         {

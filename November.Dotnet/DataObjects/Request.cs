@@ -21,6 +21,7 @@ namespace November.Dotnet
         public int lender_rating { get; set; }
         public UserProfile user { get; set; }
         public AtlasGame game { get; set; }
+        public int status { get; set; }
     }
 
     public class GameRequestDetail
@@ -52,7 +53,8 @@ namespace November.Dotnet
         public DateTime return_sent { get; set; }
         public DateTime return_recieved { get; set; }
         public int requester_rating { get; set; }
-        public int lender_rating { get; set; }
+        public int lender_rating { get; set; } 
+        public int status { get; set; }
     }
     public class GameRequestPut
     {
@@ -65,6 +67,7 @@ namespace November.Dotnet
         public bool return_recieved { get; set; }
         public int requester_rating { get; set; }
         public int lender_rating { get; set; }
+        public int status { get; set; }
     }
     public class GameRequestPost
     {
@@ -72,6 +75,7 @@ namespace November.Dotnet
         public string step { get; set; }
         public int requester_rating { get; set; }
         public int lender_rating { get; set; }
+        public int status {get; set;}
     }
     public class GameRequestReturn
     {
