@@ -128,10 +128,12 @@ namespace November.Dotnet.Controllers
                     }
                     catch
                     {
+                        var profile = Profile();
                         var id = ObjectId.GenerateNewId().ToString();
                         var password = randompassword();
                         host.c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
                         host.c_profile.InsertOneAsync(new UserProfile { user_id = id, email = body.email });
+                        host.c_friend.InsertOneAsync(new UserFriend { user_id = id, friend_id = profile.user_id });
                         var sg_subject = "This is going to be Fun!!!";
                         var sg_to = new EmailAddress(body.email);
                         var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email + " password: " + password;
