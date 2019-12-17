@@ -67,6 +67,11 @@ namespace November.Dotnet.Controllers
                            
                             }
                         } 
+                        if(user == true){
+                            try{
+                                doc.user = GetProfile(doc.user_id);
+                            }catch{}
+                        }
                      
                         games.Add(doc);
                     }
