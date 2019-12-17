@@ -1,25 +1,43 @@
 import React, { Component } from "react";
 import { Table } from "react-bootstrap";
+import queryString from 'query-string'
+import { useHistory, useRouteMatch, useParams } from "react-router-dom";
 import { Image } from "react-bootstrap";
+
 
 import "../App.css";
 
 export class GameLibrary extends Component {
   constructor(props) {
     super(props);
+
     this.state = {
-      librarySearch: ""
-    };
+      librarySearch: "",
+      usernameSearch: null
+    }; 
   }
 
-  navToGame(gameId) {
-    console.log(gameId);
+  componentDidMount() { 
+  const values = queryString.parse(window.location.search)
+  if(values.s != undefined){
+      this.setState({ librarySearch: values.s.toLowerCase() });
+    }
+    if(values.u != undefined){
+      this.setState({ usernameSearch: values.u.toLowerCase() });
+    }
   }
 
+ 
+    
   renderTableData(props) {
+    let history = useHistory();
+    function navToGame(gameId){
+      console.log(gameId)
+      history.push("/Game/" + gameId)
+    }
     console.log("render table data: ", props);
     const tableItems = props.gamelibrary.map(game => (
-      <tr key={game._id}>
+      <tr onClick={()=>navToGame(game._id)} key={game._id}>
         <td key={game._id}>
           <Image
             key={game.atlas.images.small.toString()}
@@ -28,9 +46,9 @@ export class GameLibrary extends Component {
           ></Image>
         </td>
         <td key={game.atlas.id}>
-          <a href={"/Game/" + game._id}>{game.atlas.name}</a>
+         {game.atlas ? game.atlas.name : null}
           <br />
-          UserId: {game.user_id}
+          <div >@ {game.user ? game.user.username : null}</div>
         </td>
       </tr>
     ));
@@ -45,19 +63,33 @@ export class GameLibrary extends Component {
   render() {
     let filteredList = this.props.gamelibrary.filter(game => {
       return (
-        game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !== -1
+           (
+              this.state.usernameSearch === null &&
+              game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !== -1
+              
+            )||(
+              this.state.usernameSearch !== null && 
+              // game.user.username.toLowerCase() === this.state.usernameSearch &&
+              game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !== -1
+           )
       );
     });
-    if (this.props.gamelibrary !== null) {
+    if ( this.props.gamelibrary !== []) {
       return (
         <React.Fragment>
-          <h2>All Games</h2>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="search"
-            onChange={this.searchHandler.bind(this)}
-          ></input>
+          <div className="input-group mb-3">
+            <div className="input-group-prepend">
+      <span className="input-group-text" id="basic-addon1">@{this.state.usernameSearch !== null ? this.state.usernameSearch : "All"}</span>
+            </div>
+            <input
+              type="text"
+              className="form-control"
+              placeholder="search"
+              value={this.state.librarySearch}
+              onChange={this.searchHandler.bind(this)}
+            >
+            </input>
+          </div>
           <Table striped bordered hover>
             <thead>
               <tr>

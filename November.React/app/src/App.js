@@ -43,6 +43,13 @@ class App extends Component {
     console.log("component did mount appjs");
     this.getProfile();
 
+   
+    if(localStorage.getItem('gamelibrary')){
+      this.setState({'gamelibrary':JSON.parse(localStorage.getItem("gamelibrary"))});
+      console.log("games in localstorage",JSON.parse(localStorage.getItem('gamelibrary')))
+    }
+  
+
     if (localStorage.getItem("apiKey") !== null) {
       this.getGameLibrary();
     }
@@ -76,8 +83,10 @@ class App extends Component {
           games.push(response2.data[g2]);
         }
         this.setState({ gamelibrary: games });
+        localStorage.setItem("gamelibrary",JSON.stringify(games));
       });
     });
+
   };
 
   gameSearch = searchstring => {

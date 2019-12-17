@@ -21,6 +21,7 @@ namespace November.Dotnet
         [BsonRepresentation(BsonType.ObjectId)]
         public string friend_id { get; set; }
         public bool accepted { get; set; }
+        public UserProfileSummary friend {get; set;}
     }
     public class UserFriendPut
     {

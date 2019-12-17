@@ -107,7 +107,7 @@ namespace November.Dotnet.Controllers
                 try
                 {
                     var docs = host.c_auth.Find(x => x.username == body.email).ToList().First();
-                    return Ok("User Already Added");
+                    return Ok("User Already Exists");
                 }
                 catch
                 {

@@ -55,6 +55,14 @@ namespace November.Dotnet.Controllers
             {
                 var profile = Profile();
                 var docs = host.c_friend.Find(x => x.user_id == profile.user_id).ToList();
+                List<UserFriend> friends = new List<UserFriend>();
+                foreach(var f in docs){
+                    try{
+                           f.friend = GetProfileSummary(f.friend_id);
+                    }catch{}
+                 
+                    friends.Add(f);
+                }
                 return Ok(docs);
             }
             else
@@ -233,6 +241,10 @@ namespace November.Dotnet.Controllers
             var profile = host.c_profile.Find(x => x.user_id == session.user_id).ToList().First();
 
             return profile;
+        }
+         UserProfileSummary GetProfileSummary(string user_id)
+        {
+            return new UserProfileSummary(host.c_profile.Find(x => x.user_id == user_id).ToList().First());
         }
     }
 }
