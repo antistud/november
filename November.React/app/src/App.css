@@ -57,3 +57,17 @@ a {
 .hidden{
   display:none;
 }
+
+.card-horizontal {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.transitionStep {
+  filter: grayscale(1);
+}
+
+.transitionStep.accomplished {
+  filter: grayscale(0);
+}
+
