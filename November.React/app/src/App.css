@@ -51,11 +51,11 @@ a {
   font-weight: 100 !important;
 }
 .friendLink {
-  width:100%;
+  width: 100%;
   float: right;
 }
-.hidden{
-  display:none;
+.hidden {
+  display: none;
 }
 
 .card-horizontal {
@@ -70,4 +70,3 @@ a {
 .transitionStep.accomplished {
   filter: grayscale(0);
 }
-

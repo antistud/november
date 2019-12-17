@@ -56,11 +56,14 @@ namespace November.Dotnet.Controllers
                 var profile = Profile();
                 var docs = host.c_friend.Find(x => x.user_id == profile.user_id).ToList();
                 List<UserFriend> friends = new List<UserFriend>();
-                foreach(var f in docs){
-                    try{
-                           f.friend = GetProfileSummary(f.friend_id);
-                    }catch{}
-                 
+                foreach (var f in docs)
+                {
+                    try
+                    {
+                        f.friend = GetProfileSummary(f.friend_id);
+                    }
+                    catch { }
+
                     friends.Add(f);
                 }
                 return Ok(docs);
@@ -82,9 +85,14 @@ namespace November.Dotnet.Controllers
             {
                 var docs = new List<UserProfileSummary>();
                 var users = host.c_profile.Find(_ => true).ToList();
-                foreach(var user in users){
-                   var p = new  UserProfileSummary(user);
-                   docs.Add(p);
+                foreach (var user in users)
+                {
+                    if (user.username != null && user.name != null)
+                    {
+                        var p = new UserProfileSummary(user);
+                        docs.Add(p);
+                    }
+
                 }
                 return Ok(docs);
             }
@@ -105,13 +113,13 @@ namespace November.Dotnet.Controllers
             var friendId = ObjectId.Parse(id).ToString();
             try
             {
-                var docs = host.c_friend.Find(x => x.user_id == friendId && x.friend_id == profile.user_id ).ToList().First();
+                var docs = host.c_friend.Find(x => x.user_id == friendId && x.friend_id == profile.user_id).ToList().First();
                 return Ok("Friend Already Added");
             }
             catch
             {
                 var newid = ObjectId.GenerateNewId().ToString();
-                host.c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = profile.user_id , user_id = friendId});
+                host.c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = profile.user_id, user_id = friendId });
                 var newFriedid = ObjectId.GenerateNewId().ToString();
                 host.c_friend.InsertOneAsync(new UserFriend { _id = newFriedid, friend_id = friendId, user_id = profile.user_id });
                 return Ok(id.ToString());
@@ -128,18 +136,21 @@ namespace November.Dotnet.Controllers
             var profile = Profile();
 
             var friendId = ObjectId.Parse(id).ToString();
-          
+
             // Favorite
-                try{
-      var friend = host.c_friend.Find(x => x.user_id == profile.user_id  && x.friend_id == friendId).ToList().First();
+            try
+            {
+                var friend = host.c_friend.Find(x => x.user_id == profile.user_id && x.friend_id == friendId).ToList().First();
                 var filter = Builders<UserFriend>.Filter.Eq(x => x._id, friend._id);
                 var update = Builders<UserFriend>.Update.Set(x => x.accepted, body.accepted);
                 host.c_friend.UpdateOneAsync(filter, update);
                 return Ok("success");
-                }catch{
-                    return Ok("failed");
-                }
-          
+            }
+            catch
+            {
+                return Ok("failed");
+            }
+
 
         }
 
@@ -242,7 +253,7 @@ namespace November.Dotnet.Controllers
 
             return profile;
         }
-         UserProfileSummary GetProfileSummary(string user_id)
+        UserProfileSummary GetProfileSummary(string user_id)
         {
             return new UserProfileSummary(host.c_profile.Find(x => x.user_id == user_id).ToList().First());
         }
