@@ -25,6 +25,9 @@ const User = {
       { headers: this.auth_headers }
     );
   },
+  getUsers() {
+    return axios.get(this.host + "/User/all", { headers: this.auth_headers });
+  }
 };
 
 export default User;

@@ -1,3 +1,4 @@
+
 import React, { Component,useEffect ,useState} from "react";
 import User from "../../services/user";
 
@@ -17,6 +18,7 @@ function Friends() {
   return(
     <div>Hello Friends</div>
   ) 
+
 }
 
 export default Friends;

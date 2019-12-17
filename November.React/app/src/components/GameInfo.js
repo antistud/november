@@ -14,7 +14,7 @@ export class GameInfo extends Component {
     }
   };
   getLibraryIds = () => {
-    if (this.props.gamelibrary != null) {
+    if (this.props.gamelibrary !== null) {
       return this.props.gamelibrary.map(id => id.atlas_id);
     } else {
       return [];
@@ -27,7 +27,7 @@ export class GameInfo extends Component {
       Game.addGame(gameId)
         .then(res => {
           this.props.updategamelibrary();
-          if (res.status != 200) {
+          if (res.status !== 200) {
             alert("There was an error saving the game");
           }
         })
