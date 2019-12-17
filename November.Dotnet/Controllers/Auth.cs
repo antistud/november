@@ -100,10 +100,12 @@ namespace November.Dotnet.Controllers
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
-
+            
             if (CheckSessionId() != false)
             {
-
+               var emailPattern = @"\b[\w\.-]+@[\w\.-]+\.\w{2,10}\b";
+                Regex rgx = new Regex(emailPattern);
+                if(rgx.IsMatch(body.email) == true){
                 try
                 {
                     var docs = host.c_auth.Find(x => x.username == body.email).ToList().First();
@@ -124,6 +126,9 @@ namespace November.Dotnet.Controllers
                     sg_response.ToJson();
                     return Ok("success");
                 }
+                        }else{
+                            return Ok("is not an email");
+                        }
             }
             else
             {

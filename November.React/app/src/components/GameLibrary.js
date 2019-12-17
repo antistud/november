@@ -48,7 +48,7 @@ export class GameLibrary extends Component {
         <td key={game.atlas.id}>
          {game.atlas ? game.atlas.name : null}
           <br />
-          <div >@ {game.user ? game.user.username : null}</div>
+          <div >@{game.user ? game.user.username : null}</div>
         </td>
       </tr>
     ));
@@ -69,7 +69,7 @@ export class GameLibrary extends Component {
               
             )||(
               this.state.usernameSearch !== null && 
-              // game.user.username.toLowerCase() === this.state.usernameSearch &&
+             game.user.username.toLowerCase() === this.state.usernameSearch &&
               game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !== -1
            )
       );
@@ -79,7 +79,7 @@ export class GameLibrary extends Component {
         <React.Fragment>
           <div className="input-group mb-3">
             <div className="input-group-prepend">
-      <span className="input-group-text" id="basic-addon1">@{this.state.usernameSearch !== null ? this.state.usernameSearch : "All"}</span>
+            <span className="input-group-text" id="basic-addon1">@{this.state.usernameSearch !== null ? this.state.usernameSearch : "all"}</span>
             </div>
             <input
               type="text"
@@ -102,9 +102,7 @@ export class GameLibrary extends Component {
                 {/* <th></th> */}
               </tr>
             </thead>
-
             {/* <tbody>{this.renderTableData()}</tbody> */}
-
             <this.renderTableData
               gamelibrary={filteredList}
             ></this.renderTableData>
