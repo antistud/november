@@ -41,7 +41,7 @@ namespace November.Dotnet.Controllers
                 return Ok("false");
             };
 
-        }  
+        }
         [HttpPut]
         [Route("Reset")]
         public IActionResult PutReset([FromBody] UserPutReset body)
@@ -50,45 +50,59 @@ namespace November.Dotnet.Controllers
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
-              if (CheckSessionId() != false)
+            if (CheckSessionId() != false)
             {
-            try
-            {
-                var profile = Profile();
-                var user = host.c_auth.Find(x => x._id == profile.user_id).ToList().First();
-                var filter = Builders<User>.Filter.Eq(x => x._id, profile.user_id);
-                if(user.hash == UserPassword.HashPassword(body.password)){
-                    try{
+                try
+                {
+                    var profile = Profile();
+                    var user = host.c_auth.Find(x => x._id == profile.user_id).ToList().First();
+                    var filter = Builders<User>.Filter.Eq(x => x._id, profile.user_id);
+                    if (user.hash == UserPassword.HashPassword(body.password))
+                    {
+                        try
+                        {
                             var passwordRegex = @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$";
                             Regex rgx = new Regex(passwordRegex);
-                        if(rgx.IsMatch(body.newpassword) == true){
+                            if (rgx.IsMatch(body.newpassword) == true)
+                            {
 
-                       
-                        var update = Builders<User>.Update.Set(x => x.hash, UserPassword.HashPassword(body.newpassword));
-                        host.c_auth.UpdateOneAsync(filter, update);
-                        try{
-                        host.c_sessions.DeleteMany(a => a.user_id == profile.user_id);
-                        }catch{
 
+                                var update = Builders<User>.Update.Set(x => x.hash, UserPassword.HashPassword(body.newpassword));
+                                host.c_auth.UpdateOneAsync(filter, update);
+                                try
+                                {
+                                    host.c_sessions.DeleteMany(a => a.user_id == profile.user_id);
+                                }
+                                catch
+                                {
+
+                                }
+
+                                return Ok("password updated");
+                            }
+                            else
+                            {
+                                return Ok($"does not match REGEX:  {passwordRegex}");
+                            }
                         }
-                        
-                        return Ok("password updated");  
-                        }else{
-                            return Ok($"does not match REGEX:  {passwordRegex}");
+                        catch
+                        {
+                            return Ok("password not updated");
                         }
-                    }catch{
-                        return Ok("password not updated");
+
                     }
-                    
-                }else{
-                    return Ok("password does not match");
+                    else
+                    {
+                        return Ok("password does not match");
+                    }
+                }
+                catch
+                {
+                    return Ok("User does not exist");
                 }
             }
-            catch
+            else
             {
-                return Ok("User does not exist");
-            }
-            }else{
                 return Ok("missing or wrong session id");
             }
 
@@ -100,35 +114,38 @@ namespace November.Dotnet.Controllers
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
-            
+
             if (CheckSessionId() != false)
             {
-               var emailPattern = @"\b[\w\.-]+@[\w\.-]+\.\w{2,10}\b";
+                var emailPattern = @"\b[\w\.-]+@[\w\.-]+\.\w{2,10}\b";
                 Regex rgx = new Regex(emailPattern);
-                if(rgx.IsMatch(body.email) == true){
-                try
+                if (rgx.IsMatch(body.email) == true)
                 {
-                    var docs = host.c_auth.Find(x => x.username == body.email).ToList().First();
-                    return Ok("User Already Exists");
+                    try
+                    {
+                        var docs = host.c_auth.Find(x => x.username == body.email).ToList().First();
+                        return Ok("User Already Exists");
+                    }
+                    catch
+                    {
+                        var id = ObjectId.GenerateNewId().ToString();
+                        var password = randompassword();
+                        host.c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
+                        host.c_profile.InsertOneAsync(new UserProfile { user_id = id, email = body.email });
+                        var sg_subject = "This is going to be Fun!!!";
+                        var sg_to = new EmailAddress(body.email);
+                        var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email + " password: " + password;
+                        var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email + "<br>password: " + password + "";
+                        var sg_msg = MailHelper.CreateSingleEmail(host.sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
+                        var sg_response = host.sg_client.SendEmailAsync(sg_msg);
+                        sg_response.ToJson();
+                        return Ok("success");
+                    }
                 }
-                catch
+                else
                 {
-                    var id = ObjectId.GenerateNewId().ToString();
-                    var password = randompassword();
-                    host.c_auth.InsertOneAsync(new User { _id = id, username = body.email, hash = UserPassword.HashPassword(password) });
-                    host.c_profile.InsertOneAsync(new UserProfile { user_id = id, email = body.email });
-                    var sg_subject = "This is going to be Fun!!!";
-                    var sg_to = new EmailAddress(body.email);
-                    var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email + " password: " + password;
-                    var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email + "<br>password: " + password + "";
-                    var sg_msg = MailHelper.CreateSingleEmail(host.sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
-                    var sg_response = host.sg_client.SendEmailAsync(sg_msg);
-                    sg_response.ToJson();
-                    return Ok("success");
+                    return Ok($"{body.email} is not an email");
                 }
-                        }else{
-                            return Ok("is not an email");
-                        }
             }
             else
             {
@@ -166,7 +183,7 @@ namespace November.Dotnet.Controllers
             }
 
         }
-        
+
         [HttpPatch]
         public IActionResult Patch([FromBody] User body)
         {
