@@ -34,7 +34,7 @@ namespace November.Dotnet.Controllers
 
 
         [HttpGet]
-        public IActionResult Get([FromQuery] bool atlas,[FromQuery] bool user)
+        public IActionResult Get([FromQuery] bool atlas, [FromQuery] bool user)
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
@@ -64,15 +64,18 @@ namespace November.Dotnet.Controllers
                                 var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + doc.atlas_id);
                                 doc.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
                                 host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = doc.atlas_id, cache = atlas_api });
-                           
+
                             }
-                        } 
-                        if(user == true){
-                            try{
-                                doc.user = GetProfile(doc.user_id);
-                            }catch{}
                         }
-                     
+                        if (user == true)
+                        {
+                            try
+                            {
+                                doc.user = GetProfile(doc.user_id);
+                            }
+                            catch { }
+                        }
+
                         games.Add(doc);
                     }
                     return Ok(docs);
@@ -134,30 +137,39 @@ namespace November.Dotnet.Controllers
 
             var id = ObjectId.Parse(body._id).ToString();
             var filter = Builders<UserGame>.Filter.Eq(x => x._id, id);
-            // Favorite
-            if (body.favorite == true)
+            if (body._id == profile.user_id)
             {
-                var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
-                host.c_game.UpdateOneAsync(filter, update);
-            }
-            // 
-            if (body.atlas_id != null)
-            {
-                var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
-                host.c_game.UpdateOneAsync(filter, update);
-            }
+                if (body.favorite == true)
+                {
+                    var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
+                    host.c_game.UpdateOneAsync(filter, update);
+                }
+                // 
+                if (body.atlas_id != null)
+                {
+                    var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
+                    host.c_game.UpdateOneAsync(filter, update);
+                }
 
-            if (body.bgg_id != null)
-            {
-                var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
-                host.c_game.UpdateOneAsync(filter, update);
+                if (body.bgg_id != null)
+                {
+                    var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
+                    host.c_game.UpdateOneAsync(filter, update);
+                }
+                if (body.status != 0)
+                {
+                    var update = Builders<UserGame>.Update.Set(x => x.status, body.status);
+                    host.c_game.UpdateOneAsync(filter, update);
+                }
+                return Ok("success");
             }
-            if (body.status != 0)
+            else
             {
-                var update = Builders<UserGame>.Update.Set(x => x.status, body.status);
-                host.c_game.UpdateOneAsync(filter, update);
+                return Ok("not your game");
             }
-            return Ok("success");
+            // Favorite
+
+
         }
         [HttpDelete]
         public IActionResult Delete([FromBody] UserGamePost body)
@@ -169,8 +181,26 @@ namespace November.Dotnet.Controllers
             var id = ObjectId.Parse(body._id).ToString();
             if (CheckSessionId() != false)
             {
-                host.c_game.DeleteOne(a => a._id == id);
-                return Ok("true");
+                try
+                {
+                    var game = host.c_game.Find(x => x._id == id).ToList().First();
+                    if (game.user_id == Profile().user_id)
+                    {
+                        host.c_game.DeleteOne(a => a._id == id);
+                        return Ok("deleted");
+                    }
+                    else
+                    {
+                        return Ok("not your game");
+                    }
+
+                }
+                catch
+                {
+                    return Ok("game does not exist");
+                }
+
+
             }
             else
             {
@@ -180,7 +210,7 @@ namespace November.Dotnet.Controllers
 
         [Route("Friends")]
         [HttpGet]
-        public IActionResult GetFriendGames([FromQuery] bool atlas,[FromQuery] bool user)
+        public IActionResult GetFriendGames([FromQuery] bool atlas, [FromQuery] bool user)
         {
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
@@ -214,11 +244,15 @@ namespace November.Dotnet.Controllers
                                 host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = g.atlas_id, cache = atlas_api });
                             }
                         }
-                        if(user == true){
-                            try{
-                            g.user = GetProfile(g.user_id);
-                            }catch{
-                            
+                        if (user == true)
+                        {
+                            try
+                            {
+                                g.user = GetProfile(g.user_id);
+                            }
+                            catch
+                            {
+
                             }
                         }
                         gamesls.Add(g);
