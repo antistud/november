@@ -17,7 +17,7 @@ export class GameSearch extends Component {
   }
 
   render() {
-    if (this.props.games.length != 0) {
+    if (this.props.games.length !== 0) {
       return (
         <Table striped bordered hover>
           <thead>
