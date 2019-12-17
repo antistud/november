@@ -32,6 +32,7 @@ export class AppNavbar extends Component {
               <NavDropdown title={this.props.username} id="basic-nav-dropdown">
                 <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
                 <NavDropdown.Item href="/requests">Manage Requests</NavDropdown.Item>
+                <NavDropdown.Item href="/friends">Friends</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => this.logout()}>
                   Logout
                 </NavDropdown.Item>

@@ -18,6 +18,11 @@ const User = {
       headers: this.auth_headers
     });
   },
+  acceptFriend(friendId) {
+    return axios.post(this.host + "/User/Friend/" + friendId, {accepted:true}, {
+      headers: this.auth_headers
+    });
+  },
   updateProfile(body) {
     return axios.post(
       this.host + "/User",
