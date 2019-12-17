@@ -54,13 +54,14 @@ namespace November.Dotnet.Controllers
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
-                var docs = host.c_friend.Find(x => x.user_id == profile.user_id).ToList();
+                var docs = host.c_friend.Find(x => x.user_id == profile.user_id || x.friend_id == profile.user_id).ToList();
                 List<UserFriend> friends = new List<UserFriend>();
                 foreach (var f in docs)
                 {
                     try
                     {
                         f.friend = GetProfileSummary(f.friend_id);
+                        f.user = GetProfileSummary(f.user_id);
                     }
                     catch { }
 
@@ -113,15 +114,13 @@ namespace November.Dotnet.Controllers
             var friendId = ObjectId.Parse(id).ToString();
             try
             {
-                var docs = host.c_friend.Find(x => x.user_id == friendId && x.friend_id == profile.user_id).ToList().First();
+                var docs = host.c_friend.Find(x => (x.user_id == friendId && x.friend_id == profile.user_id) || (x.user_id == profile.user_id && x.friend_id == friendId)).ToList().First();
                 return Ok("Friend Already Added");
             }
             catch
             {
                 var newid = ObjectId.GenerateNewId().ToString();
                 host.c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = profile.user_id, user_id = friendId });
-                var newFriedid = ObjectId.GenerateNewId().ToString();
-                host.c_friend.InsertOneAsync(new UserFriend { _id = newFriedid, friend_id = friendId, user_id = profile.user_id });
                 return Ok(id.ToString());
             }
 
@@ -144,7 +143,9 @@ namespace November.Dotnet.Controllers
                 var filter = Builders<UserFriend>.Filter.Eq(x => x._id, friend._id);
                 var update = Builders<UserFriend>.Update.Set(x => x.accepted, body.accepted);
                 host.c_friend.UpdateOneAsync(filter, update);
+
                 return Ok("success");
+
             }
             catch
             {

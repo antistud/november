@@ -70,3 +70,7 @@ a {
 .transitionStep.accomplished {
   filter: grayscale(0);
 }
+.profilename {
+  min-width: 200px !important;
+  text-align: right;
+}

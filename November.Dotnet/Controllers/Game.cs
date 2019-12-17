@@ -224,7 +224,7 @@ namespace November.Dotnet.Controllers
             List<UserGame> gamesls = new List<UserGame>();
             foreach (var q in query)
             {
-                if (q.friend.user_id == profile.user_id && q.friend.accepted == true)
+                if ((q.friend.user_id == profile.user_id || q.friend.friend_id == profile.user_id) && q.friend.accepted == true)
                 {
                     foreach (var g in q.game)
                     {

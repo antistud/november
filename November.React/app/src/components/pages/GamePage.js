@@ -208,7 +208,18 @@ function GamePage(props) {
         </div>
       );
     } else {
-      return null;
+      return (
+        <div className="col-sm">
+          <button
+            onClick={() => deleteGame(game._id)}
+            className="btn btn-block btn-danger mt-2"
+          >
+            <i className="fa fa-trash"></i>
+            <br />
+            Remove Game
+          </button>
+        </div>
+      );
     }
   }
 
@@ -241,17 +252,6 @@ function GamePage(props) {
               */}
 
               <RequestButton></RequestButton>
-
-              <div className="col-sm">
-                <button
-                  onClick={() => deleteGame(game._id)}
-                  className="btn btn-block btn-danger mt-2"
-                >
-                  <i className="fa fa-trash"></i>
-                  <br />
-                  Remove Game
-                </button>
-              </div>
             </div>
 
             <div className="card ">
