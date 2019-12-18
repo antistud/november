@@ -60,38 +60,71 @@ function Friends() {
     });
   }
 
-  function friendsList() {
-    let list = friends.map(friend => (
-      <div key={friend._id}>
-        <div className="card">
-          <img className="card-img-top"></img>
-          <div className="card-body">
-            <div>{friend.friend.name}</div>
-            <div className="friendLink text-right">
-              <div className={friend.accepted ? "" : "hidden"}>
-                <a
-                  className="btn btn-link"
-                  href={"/?u=" + friend.friend.username}
-                >
-                  @{friend.friend.username}
-                </a>
-              </div>
+  function friendListCard(friend) {
+    let send = "";
+    if (
+      friend.user_id === JSON.parse(localStorage.getItem("profile")).user_id
+    ) {
+      send = (
+        <div key={friend._id}>
+          <div className="card">
+            <img className="card-img-top"></img>
+            <div className="card-body">
+              <div>{friend.friend.name}</div>
+              <div className="friendLink text-right">
+                <div className={friend.accepted ? "" : "hidden"}>
+                  <a
+                    className="btn btn-link"
+                    href={"/?u=" + friend.friend.username}
+                  >
+                    @{friend.friend.username}
+                  </a>
+                </div>
 
-              <div className={friend.accepted ? "hidden" : ""}>
-                <button
-                  onClick={() => {
-                    handleAccept(friend.friend_id);
-                  }}
-                  className="btn btn-link"
-                >
-                  Accept
-                </button>
+                <div className={friend.accepted ? "hidden" : ""}>
+                  <button
+                    onClick={() => {
+                      handleAccept(friend.friend_id);
+                    }}
+                    className="btn btn-link"
+                  >
+                    Accept
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    ));
+      );
+    } else {
+      send = (
+        <div key={friend._id}>
+          <div className="card">
+            <img className="card-img-top"></img>
+            <div className="card-body">
+              <div>{friend.user.name}</div>
+              <div className="friendLink text-right">
+                <div className={friend.accepted ? "" : "hidden"}>
+                  <a
+                    className="btn btn-link"
+                    href={"/?u=" + friend.user.username}
+                  >
+                    @{friend.user.username}
+                  </a>
+                </div>
+                <div className={friend.accepted ? "hidden" : ""}>Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return send;
+  }
+
+  function friendsList() {
+    let list = friends.map(friend => <div>{friendListCard(friend)}</div>);
     return list;
   }
 

@@ -224,7 +224,51 @@ namespace November.Dotnet.Controllers
             List<UserGame> gamesls = new List<UserGame>();
             foreach (var q in query)
             {
-                if ((q.friend.user_id == profile.user_id || q.friend.friend_id == profile.user_id) && q.friend.accepted == true)
+                if (q.friend.user_id == profile.user_id && q.friend.accepted == true)
+                {
+                    foreach (var g in q.game)
+                    {
+                        if (atlas == true)
+                        {
+
+                            try
+                            {
+                                var cache = host.c_atlas.Find(x => x.atlas_id == g.atlas_id).ToList().First().cache;
+                                g.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(cache).games.First();
+
+                            }
+                            catch
+                            {
+                                var atlas_api = new WebClient().DownloadString("https://www.boardgameatlas.com/api/search?client_id=" + ConfigAtlas.client_id + "&ids=" + g.atlas_id);
+                                g.atlas = JsonSerializer.Deserialize<AtlasEndpoint>(atlas_api).games.First();
+                                host.c_atlas.InsertOneAsync(new AtlasGame { atlas_id = g.atlas_id, cache = atlas_api });
+                            }
+                        }
+                        if (user == true)
+                        {
+                            try
+                            {
+                                g.user = GetProfile(g.user_id);
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        gamesls.Add(g);
+                    }
+
+                }
+            }
+
+            var query2 = from friend in host.c_friend.AsQueryable()
+                         join game in host.c_game.AsQueryable() on
+                         friend.user_id equals game.user_id into game
+                         select new { friend, game };
+
+            foreach (var q in query2)
+            {
+                if (q.friend.friend_id == profile.user_id && q.friend.accepted == true)
                 {
                     foreach (var g in q.game)
                     {
