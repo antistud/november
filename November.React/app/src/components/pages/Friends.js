@@ -5,8 +5,9 @@ import { Typeahead } from "react-bootstrap-typeahead";
 
 function Friends() {
   let [friends, setFriends] = useState();
-  let [invite, setInvite] = useState();
+  let [inviteUser, setInvite] = useState();
   let [users, setUsers] = useState();
+  let [typeahead, setTypeahead] = useState();
 
   useEffect(() => {
     getFriends();
@@ -31,25 +32,32 @@ function Friends() {
       console.log("Users", res.data);
     });
   }
-  function inviteHandler(value) {
-    if (value && value[0]) {
-      console.log("value", value[0]);
-      setInvite(value[0]);
-    }
-  }
+  // function inviteHandler(value) {
+  //   if (value && value[0]) {
+  //     console.log("value", value[0]);
+  //     setInvite(value[0]);
+  //   }
+  // }
 
   function handleInvite() {
-    console.log("event", invite);
-    if (invite.user_id) {
-      console.log("add user", invite.name);
-      User.addFriend(invite.user_id).then(res => {
-        console.log(res.data);
-      });
-    } else {
-      Auth.inviteUser(invite.name).then(res => {
-        console.log(res.data);
-        setInvite("");
-      });
+    //let invite = typeahead.getInstance().getInput();
+    console.log("event", inviteUser[0]);
+    typeahead.getInstance().clear();
+    if (inviteUser[0]) {
+      if (inviteUser[0].user_id) {
+        console.log("add user", inviteUser[0].name);
+        User.addFriend(inviteUser[0].user_id).then(res => {
+          console.log(res.data);
+          //setInvite("");
+          getFriends();
+        });
+      } else {
+        Auth.inviteUser(inviteUser[0].name).then(res => {
+          console.log(res.data);
+          // setInvite("");
+          getFriends();
+        });
+      }
     }
   }
 
@@ -102,7 +110,11 @@ function Friends() {
           <div className="card">
             <img className="card-img-top"></img>
             <div className="card-body">
-              <div>{friend.user.name}</div>
+              <div>
+                {friend.user.name
+                  ? friend.user.name
+                  : "Invited User - " + friend.user.username}
+              </div>
               <div className="friendLink text-right">
                 <div className={friend.accepted ? "" : "hidden"}>
                   <a
@@ -138,6 +150,7 @@ function Friends() {
             </span>
           </div>
           <Typeahead
+            ref={ref => setTypeahead(ref)}
             id="typeaheadFriednSearch"
             allowNew
             newSelectionPrefix="Invite With Email: "
@@ -147,10 +160,9 @@ function Friends() {
             }}
             filterBy={["name", "username"]}
             options={users}
-            value={invite}
             placeholder="Choose a friend..."
-            onChange={event => {
-              inviteHandler(event);
+            onChange={o => {
+              setInvite(o);
             }}
           />
           <div className="input-group-append">
@@ -163,6 +175,21 @@ function Friends() {
             >
               Send
             </span>
+          </div>
+        </div>
+        <div className="row">
+          <div className=" col-sm-12">
+            <h2>
+              Friends
+              <button
+                onClick={() => {
+                  getFriends();
+                }}
+                className="btn btn-link"
+              >
+                <i class="fas fa-sync"></i>
+              </button>
+            </h2>
           </div>
         </div>
         {friendsList()}
