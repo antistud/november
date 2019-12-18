@@ -27,11 +27,19 @@ export class AppNavbar extends Component {
               </NavDropdown>
             </Nav>
           </Navbar.Collapse>
-          <Navbar.Collapse className="justify-content-end basic-navbar-nav">
+          <Navbar.Collapse className="justify-content-end basic-navbar-nav ">
             <Nav>
-              <NavDropdown title={this.props.username} id="basic-nav-dropdown">
+              <NavDropdown
+                title={
+                  this.props.username ? this.props.username : "Add Profile Name"
+                }
+                id="basic-nav-dropdown"
+                className="profilename"
+              >
                 <NavDropdown.Item href="/profile">Profile</NavDropdown.Item>
-                <NavDropdown.Item href="/requests">Manage Requests</NavDropdown.Item>
+                <NavDropdown.Item href="/requests">
+                  Manage Requests
+                </NavDropdown.Item>
                 <NavDropdown.Item href="/friends">Friends</NavDropdown.Item>
                 <NavDropdown.Item onClick={() => this.logout()}>
                   Logout

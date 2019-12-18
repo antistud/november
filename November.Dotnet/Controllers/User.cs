@@ -54,13 +54,17 @@ namespace November.Dotnet.Controllers
             if (CheckSessionId() != false)
             {
                 var profile = Profile();
-                var docs = host.c_friend.Find(x => x.user_id == profile.user_id).ToList();
+                var docs = host.c_friend.Find(x => x.user_id == profile.user_id || x.friend_id == profile.user_id).ToList();
                 List<UserFriend> friends = new List<UserFriend>();
-                foreach(var f in docs){
-                    try{
-                           f.friend = GetProfileSummary(f.friend_id);
-                    }catch{}
-                 
+                foreach (var f in docs)
+                {
+                    try
+                    {
+                        f.friend = GetProfileSummary(f.friend_id);
+                        f.user = GetProfileSummary(f.user_id);
+                    }
+                    catch { }
+
                     friends.Add(f);
                 }
                 return Ok(docs);
@@ -82,9 +86,14 @@ namespace November.Dotnet.Controllers
             {
                 var docs = new List<UserProfileSummary>();
                 var users = host.c_profile.Find(_ => true).ToList();
-                foreach(var user in users){
-                   var p = new  UserProfileSummary(user);
-                   docs.Add(p);
+                foreach (var user in users)
+                {
+                    if (user.username != null && user.name != null)
+                    {
+                        var p = new UserProfileSummary(user);
+                        docs.Add(p);
+                    }
+
                 }
                 return Ok(docs);
             }
@@ -105,15 +114,13 @@ namespace November.Dotnet.Controllers
             var friendId = ObjectId.Parse(id).ToString();
             try
             {
-                var docs = host.c_friend.Find(x => x.user_id == friendId && x.friend_id == profile.user_id ).ToList().First();
+                var docs = host.c_friend.Find(x => (x.user_id == friendId && x.friend_id == profile.user_id) || (x.user_id == profile.user_id && x.friend_id == friendId)).ToList().First();
                 return Ok("Friend Already Added");
             }
             catch
             {
                 var newid = ObjectId.GenerateNewId().ToString();
-                host.c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = profile.user_id , user_id = friendId});
-                var newFriedid = ObjectId.GenerateNewId().ToString();
-                host.c_friend.InsertOneAsync(new UserFriend { _id = newFriedid, friend_id = friendId, user_id = profile.user_id });
+                host.c_friend.InsertOneAsync(new UserFriend { _id = newid, friend_id = profile.user_id, user_id = friendId });
                 return Ok(id.ToString());
             }
 
@@ -128,18 +135,23 @@ namespace November.Dotnet.Controllers
             var profile = Profile();
 
             var friendId = ObjectId.Parse(id).ToString();
-          
+
             // Favorite
-                try{
-      var friend = host.c_friend.Find(x => x.user_id == profile.user_id  && x.friend_id == friendId).ToList().First();
+            try
+            {
+                var friend = host.c_friend.Find(x => x.user_id == profile.user_id && x.friend_id == friendId).ToList().First();
                 var filter = Builders<UserFriend>.Filter.Eq(x => x._id, friend._id);
                 var update = Builders<UserFriend>.Update.Set(x => x.accepted, body.accepted);
                 host.c_friend.UpdateOneAsync(filter, update);
+
                 return Ok("success");
-                }catch{
-                    return Ok("failed");
-                }
-          
+
+            }
+            catch
+            {
+                return Ok("failed");
+            }
+
 
         }
 
@@ -149,48 +161,63 @@ namespace November.Dotnet.Controllers
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
             Response.Headers.Add("Access-Control-Allow-Headers", "*");
             Response.Headers.Add("Content-Type", "application/json");
-            if (CheckSessionId() != false)
+            try
             {
-                var profile = Profile();
-                var filter = Builders<UserProfile>.Filter.Eq(x => x.user_id, profile.user_id);
-
-                if (body.name != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.name, body.name);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.email != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.email, body.email);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.phone != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.phone, body.phone);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.address != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.address, body.address);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.city != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.city, body.city);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.state != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.state, body.state);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
-                if (body.zip != null)
-                {
-                    var update = Builders<UserProfile>.Update.Set(x => x.zip, body.zip);
-                    host.c_profile.UpdateOneAsync(filter, update);
-                }
+                host.c_profile.Find(x => x.username == body.username && x.user_id != body.user_id).ToList().First();
+                return Ok("Username Already Exists");
             }
-            return Ok("Success");
+            catch
+            {
+                if (CheckSessionId() != false)
+                {
+                    var profile = Profile();
+                    var filter = Builders<UserProfile>.Filter.Eq(x => x.user_id, profile.user_id);
+
+                    if (body.name != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.name, body.name);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.email != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.email, body.email);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.username != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.username, body.username);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.phone != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.phone, body.phone);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.address != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.address, body.address);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.city != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.city, body.city);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.state != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.state, body.state);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                    if (body.zip != null)
+                    {
+                        var update = Builders<UserProfile>.Update.Set(x => x.zip, body.zip);
+                        host.c_profile.UpdateOneAsync(filter, update);
+                    }
+                }
+                return Ok("Success");
+
+            }
+
 
         }
         [HttpDelete]
@@ -242,7 +269,7 @@ namespace November.Dotnet.Controllers
 
             return profile;
         }
-         UserProfileSummary GetProfileSummary(string user_id)
+        UserProfileSummary GetProfileSummary(string user_id)
         {
             return new UserProfileSummary(host.c_profile.Find(x => x.user_id == user_id).ToList().First());
         }
