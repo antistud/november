@@ -31,6 +31,7 @@ function ProfileEdit() {
   }
   const schema = yup.object({
     name: yup.string().required(),
+    username: yup.string().required(),
     city: yup.string().required(),
     state: yup.string().required(),
     zip: yup.string().required(),
@@ -84,7 +85,7 @@ function ProfileEdit() {
                 <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
               </Form.Group>
 
-              <Form.Group as={Col} md="3" controlId="validationFormikUsername">
+              <Form.Group as={Col} md="3" controlId="validationFormik02">
                 <Form.Label>Username</Form.Label>
                 <InputGroup>
                   <InputGroup.Prepend>
@@ -92,19 +93,20 @@ function ProfileEdit() {
                   </InputGroup.Prepend>
                   <Form.Control
                     type="text"
-                    placeholder={profile.username}
+                    placeholder="Username"
                     aria-describedby="inputGroupPrepend"
                     name="username"
                     value={values.username}
                     onChange={handleChange}
                     isInvalid={!!errors.username}
+                    isValid={touched.username && !errors.username}
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.username}
                   </Form.Control.Feedback>
                 </InputGroup>
               </Form.Group>
-              <Form.Group as={Col} md="3" controlId="validationFormik02">
+              <Form.Group as={Col} md="3" controlId="validationFormik03">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
@@ -115,11 +117,11 @@ function ProfileEdit() {
                   isInvalid={!!errors.email}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.username}
+                  {errors.email}
                 </Form.Control.Feedback>
                 <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
               </Form.Group>
-              <Form.Group as={Col} md="3" controlId="validationFormik03">
+              <Form.Group as={Col} md="3" controlId="validationFormik04">
                 <Form.Label>Phone</Form.Label>
                 <Form.Control
                   type="phone"
@@ -132,7 +134,7 @@ function ProfileEdit() {
               </Form.Group>
             </Form.Row>
             <Form.Row>
-              <Form.Group as={Col} md="3" controlId="validationFormik04">
+              <Form.Group as={Col} md="3" controlId="validationFormik05">
                 <Form.Label>Address</Form.Label>
                 <Form.Control
                   type="text"
@@ -147,7 +149,7 @@ function ProfileEdit() {
                   {errors.address}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group as={Col} md="3" controlId="validationFormik04">
+              <Form.Group as={Col} md="3" controlId="validationFormik06">
                 <Form.Label>City</Form.Label>
                 <Form.Control
                   type="text"
@@ -162,7 +164,7 @@ function ProfileEdit() {
                   {errors.city}
                 </Form.Control.Feedback>
               </Form.Group>
-              <Form.Group as={Col} md="3" controlId="validationFormik05">
+              <Form.Group as={Col} md="3" controlId="validationFormik07">
                 <Form.Label>State</Form.Label>
                 <Form.Control
                   type="text"
