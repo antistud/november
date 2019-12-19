@@ -74,3 +74,22 @@ a {
   min-width: 200px !important;
   text-align: right;
 }
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  color: white;
+  background-color: #fff;
+  text-align: center;
+}
+@media only screen and (min-width: 1025px) {
+  .footer {
+    display: none;
+  }
+}
+@media only screen and (max-width: 1025px) {
+  .buttons {
+    display: none;
+  }
+}
