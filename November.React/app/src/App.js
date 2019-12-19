@@ -22,10 +22,10 @@ import GameSearchBox from "./components/GameSearchBox";
 import GameSearch from "./components/GameSearch";
 import About from "./components/pages/About";
 import Homepage from "./components/pages/Homepage";
-import ProfileEdit from "./components/pages/ProfileEdit"
+import ProfileEdit from "./components/pages/ProfileEdit";
 import Login from "./components/pages/Login";
 import GamePage from "./components/pages/GamePage";
-import RequestManagement from "./components/pages/RequestManagement"
+import RequestManagement from "./components/pages/RequestManagement";
 
 library.add(faUserCircle, faUserEdit);
 class App extends Component {
@@ -44,12 +44,15 @@ class App extends Component {
     console.log("component did mount appjs");
     this.getProfile();
 
-   
-    if(localStorage.getItem('gamelibrary')){
-      this.setState({'gamelibrary':JSON.parse(localStorage.getItem("gamelibrary"))});
-      console.log("games in localstorage",JSON.parse(localStorage.getItem('gamelibrary')))
+    if (localStorage.getItem("gamelibrary")) {
+      this.setState({
+        gamelibrary: JSON.parse(localStorage.getItem("gamelibrary"))
+      });
+      console.log(
+        "games in localstorage",
+        JSON.parse(localStorage.getItem("gamelibrary"))
+      );
     }
-  
 
     if (localStorage.getItem("apiKey") !== null) {
       this.getGameLibrary();
@@ -84,17 +87,16 @@ class App extends Component {
           games.push(response2.data[g2]);
         }
         this.setState({ gamelibrary: games });
-        localStorage.setItem("gamelibrary",JSON.stringify(games));
+        localStorage.setItem("gamelibrary", JSON.stringify(games));
       });
     });
-
   };
 
   gameSearch = searchstring => {
     searchGames(
       "https://www.boardgameatlas.com/api/search?name=" +
-      searchstring +
-      "&limit=10&client_id=PaLV4upJP7"
+        searchstring +
+        "&limit=10&client_id=PaLV4upJP7"
     ).then(response => {
       this.setState({
         games: response.data.games
@@ -227,6 +229,31 @@ class App extends Component {
               ></Route>
             </Switch>
           </Container>
+          <div>
+            <br /> <br /> <br /> <br /> <br />
+          </div>
+          <div className="footer">
+            <div className="row">
+              <div className="col-4">
+                <a href="/gamesearch" className="btn btn-link btn-block">
+                  <i class="fas fa-dice"></i>
+                  <br /> Add Game
+                </a>
+              </div>
+              <div className="col-4">
+                <a href="/friends" className="btn btn-link btn-block">
+                  <i class="fas fa-user-friends"></i>
+                  <br /> Friends
+                </a>
+              </div>
+              <div className="col-4">
+                <a href="/requests" className="btn btn-link btn-block">
+                  <i class="fas fa-share-square"></i>
+                  <br /> Requests
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </Router>
     );

@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { Table } from "react-bootstrap";
-import queryString from 'query-string'
+import queryString from "query-string";
 import { useHistory, useRouteMatch, useParams } from "react-router-dom";
 import { Image } from "react-bootstrap";
-
 
 import "../App.css";
 
@@ -14,41 +13,39 @@ export class GameLibrary extends Component {
     this.state = {
       librarySearch: "",
       usernameSearch: null
-    }; 
+    };
   }
 
-  componentDidMount() { 
-  const values = queryString.parse(window.location.search)
-  if(values.s != undefined){
+  componentDidMount() {
+    const values = queryString.parse(window.location.search);
+    if (values.s != undefined) {
       this.setState({ librarySearch: values.s.toLowerCase() });
     }
-    if(values.u != undefined){
+    if (values.u != undefined) {
       this.setState({ usernameSearch: values.u.toLowerCase() });
     }
   }
 
- 
-    
   renderTableData(props) {
     let history = useHistory();
-    function navToGame(gameId){
-      console.log(gameId)
-      history.push("/Game/" + gameId)
+    function navToGame(gameId) {
+      console.log(gameId);
+      history.push("/Game/" + gameId);
     }
     console.log("render table data: ", props);
     const tableItems = props.gamelibrary.map(game => (
-      <tr onClick={()=>navToGame(game._id)} key={game._id}>
-        <td key={game._id}>
+      <tr onClick={() => navToGame(game._id)} key={game._id}>
+        <td className="tdimage">
           <Image
             key={game.atlas.images.small.toString()}
             className="gameImage"
             src={game.atlas.images.small}
           ></Image>
         </td>
-        <td key={game.atlas.id}>
-         {game.atlas ? game.atlas.name : null}
+        <td>
+          {game.atlas ? game.atlas.name : null}
           <br />
-          <div >@{game.user ? game.user.username : null}</div>
+          <div>@{game.user ? game.user.username : null}</div>
         </td>
       </tr>
     ));
@@ -63,23 +60,26 @@ export class GameLibrary extends Component {
   render() {
     let filteredList = this.props.gamelibrary.filter(game => {
       return (
-           (
-              this.state.usernameSearch === null &&
-              game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !== -1
-              
-            )||(
-              this.state.usernameSearch !== null && 
-             game.user.username.toLowerCase() === this.state.usernameSearch &&
-              game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !== -1
-           )
+        (this.state.usernameSearch === null &&
+          game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !==
+            -1) ||
+        (this.state.usernameSearch !== null &&
+          game.user.username.toLowerCase() === this.state.usernameSearch &&
+          game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !==
+            -1)
       );
     });
-    if ( this.props.gamelibrary !== []) {
+    if (this.props.gamelibrary !== []) {
       return (
         <React.Fragment>
           <div className="input-group mb-3">
             <div className="input-group-prepend">
-            <span className="input-group-text" id="basic-addon1">@{this.state.usernameSearch !== null ? this.state.usernameSearch : "all"}</span>
+              <span className="input-group-text" id="basic-addon1">
+                @
+                {this.state.usernameSearch !== null
+                  ? this.state.usernameSearch
+                  : "all"}
+              </span>
             </div>
             <input
               type="text"
@@ -87,18 +87,39 @@ export class GameLibrary extends Component {
               placeholder="search"
               value={this.state.librarySearch}
               onChange={this.searchHandler.bind(this)}
-            >
-            </input>
+            ></input>
+          </div>
+          <div className="buttons">
+            <div className="row">
+              <div className="col-4">
+                <a href="/gamesearch" className="btn btn-link btn-block">
+                  <i class="fas fa-dice"></i>
+                  <br /> Add Game
+                </a>
+              </div>
+              <div className="col-4">
+                <a href="/friends" className="btn btn-link btn-block">
+                  <i class="fas fa-user-friends"></i>
+                  <br /> Friends
+                </a>
+              </div>
+              <div className="col-4">
+                <a href="/requests" className="btn btn-link btn-block">
+                  <i class="fas fa-share-square"></i>
+                  <br /> Requests
+                </a>
+              </div>
+            </div>
           </div>
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th>
+                {/* <th>
                   <a href="/gamesearch" className="btn btn-block ">
                     <i className="fa fa-folder-plus fa-fw fa-2x"></i>
                   </a>
                 </th>
-                <th>Name</th>
+                <th>Name</th> */}
                 {/* <th></th> */}
               </tr>
             </thead>
