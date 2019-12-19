@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import Request from "../../services/request";
-import { CardColumns, Card } from "react-bootstrap";
+import { CardColumns, Card, Col } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import Moment from "react-moment";
 import Game from "../../services/game";
-import Requests from "../../services/request";
+
 import "react-step-progress-bar/styles.css";
 import { ProgressBar, Step } from "react-step-progress-bar";
 function RequestManagement() {
   let [state, setState] = useState();
+  let [profile, setProfile] = useState(
+    JSON.parse(localStorage.getItem("profile"))
+  );
   let history = useHistory();
   function onClick(game_id) {
     console.log(game_id);
@@ -20,70 +23,149 @@ function RequestManagement() {
   useEffect(() => {
     console.log(state);
     Request.getRequests().then(res => {
+      setProfile(JSON.parse(localStorage.getItem("profile")));
       console.log(res);
       if (res.data) {
         setState({ requests: res.data });
       }
     });
+    console.log(profile);
   }, []);
-
+  function reloadRequests() {
+    Request.getRequests().then(res => {
+      console.log(res);
+      if (res.data) {
+        setState({ requests: res.data });
+      }
+    });
+  }
+  function markStep(step, requestId) {
+    if (step == "rr") {
+      Request.markReturnAsRecieved(requestId).then(res => {
+        console.log("rr", res);
+        reloadRequests();
+      });
+    } else if (step == "rs") {
+      Request.markReturnAsSent(requestId).then(res => {
+        console.log("rs", res);
+        reloadRequests();
+      });
+    } else if (step == "sr") {
+      Request.markSendAsRecieved(requestId).then(res => {
+        console.log("sr", res);
+        reloadRequests();
+      });
+    } else if (step == "ss") {
+      Request.markSendAsSent(requestId).then(res => {
+        console.log("ss", res);
+        reloadRequests();
+      });
+    }
+  }
   function cardFooter(request) {
     if (request.send_sent != "0001-01-01T00:00:00Z") {
       return (
-        <Card.Footer>
-          <small className="text-muted"><Moment fromNow>{request.send_sent}</Moment></small>
-        </Card.Footer>
-      )
+        <div className="d-flex justify-content-between">
+          <small className="text-muted">
+            <Moment fromNow>{request.send_sent}</Moment>
+          </small>
+          <small>
+            <a onClick={() => onClick(request.game_id)}>More Info...</a>
+          </small>
+        </div>
+      );
     }
   }
   function getGameState(request) {
-    let percent = 0
-    let status = ''
+    const incoming = request.user_id !== profile.user_id;
+    let percent = 0;
+    let status = "";
+    let button = null;
     if (request.return_recieved !== "0001-01-01T00:00:00Z") {
-      percent = 100
-      status = "Game Returned"
+      percent = 100;
+      status = "Game Returned";
+    } else if (request.return_sent !== "0001-01-01T00:00:00Z") {
+      percent = 67;
+      if (incoming) {
+        status = request.user.name + " has sent your game back";
+        button = (
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => markStep("rr", request._id)}
+          >
+            Recieved Back
+          </button>
+        );
+      } else {
+        status = "You sent the game back";
+      }
+    } else if (request.send_recieved !== "0001-01-01T00:00:00Z") {
+      percent = 34;
+      if (incoming) {
+        status = request.user.name + " recieved your game.";
+      } else {
+        status = "You have the game";
+        button = (
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => markStep("rs", request._id)}
+          >
+            Return Game
+          </button>
+        );
+      }
+    } else if (request.send_sent !== "0001-01-01T00:00:00Z") {
+      percent = 0;
+      if (incoming) {
+        status = "Game sent.";
+      } else {
+        status = "On its way!";
+        button = (
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => markStep("sr", request._id)}
+          >
+            Mark Received
+          </button>
+        );
+      }
+    } else if (request.user_id !== profile.user_id) {
+      percent = 0;
+      status = request.user.name + " is waiting for you to send this game.";
+      button = (
+        <button
+          className="btn btn-block btn-success"
+          onClick={() => markStep("ss", request._id)}
+        >
+          Mark Sent
+        </button>
+      );
+    } else if (request.user_id == profile.user_id) {
+      percent = 0;
+      status = "You are waiting for this game";
     }
-    else if (request.return_sent !== "0001-01-01T00:00:00Z") {
-      percent = 67
-      status = request.user.name + " has sent your game back"
-    }
-    else if (request.send_recieved !== "0001-01-01T00:00:00Z") {
-      percent = 33
-      status = request.user.name + " recieved your game."
-    }
-    else if (request.send_sent !== "0001-01-01T00:00:00Z") {
-      percent = 0
-      status = "Game sent."
-    }
-    else {
-      percent = 0
-      status = request.user.name + " is waiting for you to send this game."
-    }
-    return { percent: percent, status: status }
-
+    return { percent: percent, status: status, button: button };
   }
   if (state) {
     console.log(state);
     let games = state.requests.map(request => {
-      if (
-        request.game !== null
-      ) {
-        let status = getGameState(request)
+      if (request.game !== null) {
+        let status = getGameState(request);
+
         return (
-          <Card
-            className="gameDetails"
-            onClick={() => onClick(request.game_id)}
-          >
+          <Card className="gameDetails">
             <Card.Img
               className="card-holder-img"
               variant="top"
-              // src={request.atlas_image}
               src={request.game.data.image_url}
               className="card-img-top"
             ></Card.Img>
             <Card.Body>
               <Card.Title>
-                {request.user.name} requested {request.game.data.name}
+                {profile.user_id !== request.user.user_id
+                  ? `${request.user.name}`
+                  : "You"}{" "}
+                requested {request.game.data.name}
               </Card.Title>
               <Card.Text>
                 <ProgressBar
@@ -93,48 +175,68 @@ function RequestManagement() {
                   <Step transition="scale">
                     {({ accomplished, index }) => (
                       <div
-                        className={`transitionStep ${accomplished ? "accomplished" : null}`}
+                        className={`transitionStep ${
+                          accomplished ? "accomplished" : null
+                        }`}
                       >
-                        <i className="fa fa-circle" style={{ color: '#00ad7f' }}></i>
+                        <i
+                          className="fa fa-circle"
+                          style={{ color: "#00ad7f" }}
+                        ></i>
                       </div>
                     )}
                   </Step>
                   <Step transition="scale">
                     {({ accomplished, index }) => (
                       <div
-                        className={`transitionStep ${accomplished ? "accomplished" : null}`}
+                        className={`transitionStep ${
+                          accomplished ? "accomplished" : null
+                        }`}
                       >
-                        <i className="fa fa-circle" style={{ color: '#00ad7f' }}></i>
+                        <i
+                          className="fa fa-circle"
+                          style={{ color: "#00ad7f" }}
+                        ></i>
                       </div>
                     )}
                   </Step>
                   <Step transition="scale">
                     {({ accomplished, index }) => (
                       <div
-                        className={`transitionStep ${accomplished ? "accomplished" : null}`}
+                        className={`transitionStep ${
+                          accomplished ? "accomplished" : null
+                        }`}
                       >
-                        <i className="fa fa-circle" style={{ color: '#00ad7f' }}></i>
+                        <i
+                          className="fa fa-circle"
+                          style={{ color: "#00ad7f" }}
+                        ></i>
                       </div>
                     )}
                   </Step>
                   <Step transition="scale">
                     {({ accomplished, index }) => (
                       <div
-                        className={`transitionStep ${accomplished ? "accomplished" : null}`}
+                        className={`transitionStep ${
+                          accomplished ? "accomplished" : null
+                        }`}
                       >
-
-                        <i className="fa fa-circle" style={{ color: '#00ad7f' }}></i>
+                        <i
+                          className="fa fa-circle"
+                          style={{ color: "#00ad7f" }}
+                        ></i>
                       </div>
                     )}
                   </Step>
-
                 </ProgressBar>
                 <br />
-                Status: {status.status}
+                <span>
+                  Status: {status.status} {status.button}
+                </span>
               </Card.Text>
+              {cardFooter(request)}
             </Card.Body>
-            {cardFooter(request)}
-          </Card >
+          </Card>
         );
       }
     });
