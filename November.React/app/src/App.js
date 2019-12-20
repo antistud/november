@@ -26,6 +26,7 @@ import ProfileEdit from "./components/pages/ProfileEdit";
 import Login from "./components/pages/Login";
 import GamePage from "./components/pages/GamePage";
 import RequestManagement from "./components/pages/RequestManagement";
+import AppFooter from "./components/AppFooter";
 
 library.add(faUserCircle, faUserEdit);
 class App extends Component {
@@ -36,7 +37,9 @@ class App extends Component {
       games: [],
       gamelibrary: [],
       apiKey: null,
-      loggedIn: false
+      loading: false,
+      loggedIn: false,
+      stats: { count: { all: 0, mine: 0, friends: 0 } }
     };
   }
 
@@ -86,7 +89,10 @@ class App extends Component {
         for (let g2 in response2.data) {
           games.push(response2.data[g2]);
         }
-        this.setState({ gamelibrary: games });
+        this.setState({
+          gamelibrary: games,
+          stats: { count: { all: games.length } }
+        });
         localStorage.setItem("gamelibrary", JSON.stringify(games));
       });
     });
@@ -155,7 +161,10 @@ class App extends Component {
                 path="/"
                 render={() =>
                   this.loginRedirect(
-                    <Homepage gamelibrary={this.state.gamelibrary}></Homepage>,
+                    <Homepage
+                      gamelibrary={this.state.gamelibrary}
+                      all={this.state.gamelibrary.length}
+                    ></Homepage>,
                     <Redirect to="/login" />
                   )
                 }
@@ -232,28 +241,7 @@ class App extends Component {
           <div>
             <br /> <br /> <br /> <br /> <br />
           </div>
-          <div className="footer">
-            <div className="row">
-              <div className="col-4">
-                <a href="/gamesearch" className="btn btn-link btn-block">
-                  <i class="fas fa-dice"></i>
-                  <br /> Add Game
-                </a>
-              </div>
-              <div className="col-4">
-                <a href="/friends" className="btn btn-link btn-block">
-                  <i class="fas fa-user-friends"></i>
-                  <br /> Friends
-                </a>
-              </div>
-              <div className="col-4">
-                <a href="/requests" className="btn btn-link btn-block">
-                  <i class="fas fa-share-square"></i>
-                  <br /> Requests
-                </a>
-              </div>
-            </div>
-          </div>
+          <AppFooter></AppFooter>
         </div>
       </Router>
     );

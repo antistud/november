@@ -9,7 +9,7 @@ function GamePage(props) {
   let [game, setGame] = useState();
   let { gameId } = useParams();
   let { url } = useRouteMatch();
-  useEffect(async () => {
+  useEffect(() => {
     getGame();
   }, []);
 
@@ -189,7 +189,8 @@ function GamePage(props) {
 
     Game.deleteGame(gameId).then(res => {
       console.log("delete game", res.data);
-      window.location.replace("/");
+      // window.location.replace("/");
+      history.push("/");
     });
   }
 
