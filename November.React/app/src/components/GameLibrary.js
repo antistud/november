@@ -89,6 +89,7 @@ export class GameLibrary extends Component {
               onChange={this.searchHandler.bind(this)}
             ></input>
           </div>
+
           <div className="buttons">
             <div className="row">
               <div className="col-4">
@@ -110,6 +111,9 @@ export class GameLibrary extends Component {
                 </a>
               </div>
             </div>
+          </div>
+          <div className="libraryTotal">
+            Games: {this.props.gamelibrary.length}
           </div>
           <Table striped bordered hover>
             <thead>
