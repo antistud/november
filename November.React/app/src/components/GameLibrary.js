@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Table } from "react-bootstrap";
 import queryString from "query-string";
-import { IsEmpty } from "react-lodash";
 import { useHistory, useRouteMatch, useParams } from "react-router-dom";
 import { Image } from "react-bootstrap";
 
@@ -58,6 +57,21 @@ export class GameLibrary extends Component {
     // console.log(this.state.librarySearch);
   }
 
+  profileCheck() {
+    if (JSON.parse(localStorage.getItem("profile")).name == null) {
+      return (
+        <div>
+          <a className="btn btn-warning btn-block" href="/profile/edit">
+            Setup Profile
+          </a>
+          <div class="text-warning">Missing Name</div>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+
   render() {
     let filteredList = this.props.gamelibrary.filter(game => {
       return (
@@ -90,50 +104,8 @@ export class GameLibrary extends Component {
               onChange={this.searchHandler.bind(this)}
             ></input>
           </div>
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).name}
-            yes={() => (
-              <a className="btn btn-warning btn-block" href="/profile/edit">
-                Setup Profile
-              </a>
-            )}
-            no={() => ""}
-          />
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).name}
-            yes={() => <div class="text-warning">Missing Name</div>}
-            no={() => ""}
-          />
-          {/* <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).address}
-            yes={() => <div class="text-warning">Missing Address</div>}
-            no={() => ""}
-          />
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).email}
-            yes={() => <div class="text-warning">Missing Email</div>}
-            no={() => ""}
-          />
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).zip}
-            yes={() => <div class="text-warning">Missing Zip</div>}
-            no={() => ""}
-          />
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).zip}
-            yes={() => <div class="text-warning">Missing State</div>}
-            no={() => ""}
-          />
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).city}
-            yes={() => <div class="text-warning">Missing City</div>}
-            no={() => ""}
-          />
-          <IsEmpty
-            value={JSON.parse(localStorage.getItem("profile")).phone}
-            yes={() => <div class="text-warning">Missing Phone</div>}
-            no={() => ""}
-          /> */}
+          {this.profileCheck()}
+
           <div className="buttons">
             <div className="row">
               <div className="col-4">
