@@ -136,8 +136,8 @@ namespace November.Dotnet.Controllers
                         host.c_friend.InsertOneAsync(new UserFriend { user_id = id, friend_id = profile.user_id });
                         var sg_subject = "This is going to be Fun!!!";
                         var sg_to = new EmailAddress(body.email.ToLower());
-                        var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email.ToLower() + " password: " + password + " URL: http://app.garishgames.com";
-                        var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email.ToLower() + "<br>password: " + password + " <br><br> <a href='http://app.garishgames.com'>Go Now</a>";
+                        var sg_plainTextContent = "You have been invited to BoxShare username: " + body.email.ToLower() + " password: " + password + " URL: http://app.garishgames.com?e=" + body.email.ToLower() + "&p=" + password;
+                        var sg_htmlContent = $"<strong>You have been invited to BoxShare.</strong><br><br>username: " + body.email.ToLower() + "<br>password: " + password + " <br><br> <a href='http://app.garishgames.com?e=" + body.email.ToLower() + "&p=" + password + "'>Go Now</a>";
                         var sg_msg = MailHelper.CreateSingleEmail(host.sg_from, sg_to, sg_subject, sg_plainTextContent, sg_htmlContent);
                         var sg_response = host.sg_client.SendEmailAsync(sg_msg);
                         sg_response.ToJson();
