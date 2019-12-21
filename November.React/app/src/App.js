@@ -3,7 +3,6 @@ import { Container } from "react-bootstrap";
 import "./App.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faUserCircle, faUserEdit } from "@fortawesome/free-solid-svg-icons";
-
 import {
   BrowserRouter as Router,
   Route,
@@ -12,7 +11,6 @@ import {
 } from "react-router-dom";
 
 import searchGames from "./services/SearchGames";
-
 import Game from "./services/game";
 import Auth from "./services/auth";
 import AppNavbar from "./components/AppNavbar";
