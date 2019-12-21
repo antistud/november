@@ -6271,7 +6271,8 @@
     ]
   },
   "packageFolders": {
-    "/Users/jrhoades/.nuget/packages/": {}
+    "/Users/jrhoades/.nuget/packages/": {},
+    "/usr/local/share/dotnet/sdk/NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
@@ -6282,6 +6283,9 @@
       "packagesPath": "/Users/jrhoades/.nuget/packages/",
       "outputPath": "/Users/jrhoades/Documents/projects/november/November.Dotnet/obj/",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+      ],
       "configFilePaths": [
         "/Users/jrhoades/.nuget/NuGet/NuGet.Config"
       ],

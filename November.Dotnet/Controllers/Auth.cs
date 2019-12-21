@@ -159,7 +159,7 @@ namespace November.Dotnet.Controllers
         [HttpPost]
         public IActionResult Post([FromBody] User body)
         {
-            var docs = host.c_auth.Find(x => x.username == body.username).ToList();
+            var docs = host.c_auth.Find(x => x.username.ToLower() == body.username.ToLower()).ToList();
             var sid = "";
             List<User> results = new List<User>();
             var found = false;
@@ -186,15 +186,15 @@ namespace November.Dotnet.Controllers
 
         }
 
-        [HttpPatch]
-        public IActionResult Patch([FromBody] User body)
-        {
-            Response.Headers.Add("Access-Control-Allow-Origin", "*");
-            Response.Headers.Add("Access-Control-Allow-Headers", "*");
-            Response.Headers.Add("Content-Type", "application/json");
-            return Ok(UserPassword.HashPassword(body.password));
+        // [HttpPatch]
+        // public IActionResult Patch([FromBody] User body)
+        // {
+        //     Response.Headers.Add("Access-Control-Allow-Origin", "*");
+        //     Response.Headers.Add("Access-Control-Allow-Headers", "*");
+        //     Response.Headers.Add("Content-Type", "application/json");
+        //     return Ok(UserPassword.HashPassword(body.password));
 
-        }
+        // }
         [HttpDelete]
         public IActionResult Delete()
         {
