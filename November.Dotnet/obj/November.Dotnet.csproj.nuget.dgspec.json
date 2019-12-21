@@ -13,6 +13,9 @@
         "packagesPath": "/Users/jrhoades/.nuget/packages/",
         "outputPath": "/Users/jrhoades/Documents/projects/november/November.Dotnet/obj/",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "/usr/local/share/dotnet/sdk/NuGetFallbackFolder"
+        ],
         "configFilePaths": [
           "/Users/jrhoades/.nuget/NuGet/NuGet.Config"
         ],
