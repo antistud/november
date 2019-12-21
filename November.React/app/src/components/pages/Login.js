@@ -1,7 +1,18 @@
 import React, { Component } from "react";
+
+import queryString from "query-string";
 import { Form, Button } from "react-bootstrap";
 
 export class Login extends Component {
+  constructor(props) {
+    super(props);
+    const values = queryString.parse(window.location.search);
+    if (values.e && values.p) {
+      this.setState({ username: values.e, password: values.p });
+      this.props.authorize({ username: values.e, password: values.p });
+    }
+  }
+
   state = { username: "", password: "" };
   onChange = e => {
     this.setState({ [e.target.name]: e.target.value });
