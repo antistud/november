@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import * as moment from "moment";
+import Request from "../services/request";
 
 function GameRequestItem(props) {
   if (props.item) {
@@ -164,8 +165,26 @@ function GameRequestItem(props) {
           </button>
         </div>
       );
+    } else if (
+      item.status != "1" &&
+      JSON.parse(localStorage.getItem("profile")).user_id !== props.game.user_id
+    ) {
+      button = (
+        <div>
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => {
+              Request.setStatus(item._id, 3).then(data => {
+                props.getGame();
+              });
+            }}
+          >
+            Cancel
+          </button>
+        </div>
+      );
     }
-    if (item.user_name && item.status !== 2) {
+    if (item.user_name && (item.status === 1 || item.status === 0)) {
       return (
         <div className="item">
           <div className="row">
@@ -195,6 +214,14 @@ function GameRequestItem(props) {
         <div className="item">
           <div className="row">
             <div className="col-sm-12">{item.user_name} - Declined</div>
+          </div>
+        </div>
+      );
+    } else if (item.user_name && item.status === 3) {
+      return (
+        <div className="item">
+          <div className="row">
+            <div className="col-sm-12">{item.user_name} - Canceled</div>
           </div>
         </div>
       );

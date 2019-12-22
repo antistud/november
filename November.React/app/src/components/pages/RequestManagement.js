@@ -29,7 +29,10 @@ function RequestManagement() {
       if (res.data) {
         setState({
           requests: _.filter(res.data, x => {
-            return x.status === 0 || x.status == 1;
+            return (
+              (x.status === 0 || x.status == 1) &&
+              x.return_recieved === "0001-01-01T00:00:00Z"
+            );
           })
         });
       }
@@ -42,7 +45,10 @@ function RequestManagement() {
       if (res.data) {
         setState({
           requests: _.filter(res.data, x => {
-            return x.status === 0 || x.status == 1;
+            return (
+              (x.status === 0 || x.status == 1) &&
+              x.return_recieved === "0001-01-01T00:00:00Z"
+            );
           })
         });
       }
