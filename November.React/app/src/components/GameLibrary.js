@@ -58,7 +58,10 @@ export class GameLibrary extends Component {
   }
 
   profileCheck() {
-    if (JSON.parse(localStorage.getItem("profile")).name == null) {
+    if (
+      JSON.parse(localStorage.getItem("profile")).name == null ||
+      JSON.parse(localStorage.getItem("profile")).name == ""
+    ) {
       return (
         <div>
           <a className="btn btn-warning btn-block" href="/profile/edit">

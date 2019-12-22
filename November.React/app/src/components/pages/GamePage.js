@@ -7,6 +7,7 @@ import Request from "../../services/request";
 function GamePage(props) {
   let history = useHistory();
   let [game, setGame] = useState();
+  let [showrequest, setShowRequest] = useState();
   let { gameId } = useParams();
   let { url } = useRouteMatch();
   useEffect(() => {
@@ -50,7 +51,10 @@ function GamePage(props) {
     let sr = <i className="far fa-circle"></i>;
     let ss = <i className="far fa-circle"></i>;
     let button = "";
-    if (r.item.return_recieved !== "0001-01-01T00:00:00Z") {
+    if (
+      r.item.return_recieved !== "0001-01-01T00:00:00Z" &&
+      r.item.status == 1
+    ) {
       rr = (
         <i
           className="fa fa-circle"
@@ -63,7 +67,8 @@ function GamePage(props) {
       );
     } else if (
       game.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
-      r.item.return_sent !== "0001-01-01T00:00:00Z"
+      r.item.return_sent !== "0001-01-01T00:00:00Z" &&
+      r.item.status == 1
     ) {
       button = (
         <button
@@ -75,7 +80,7 @@ function GamePage(props) {
       );
     }
 
-    if (r.item.return_sent !== "0001-01-01T00:00:00Z") {
+    if (r.item.return_sent !== "0001-01-01T00:00:00Z" && r.item.status == 1) {
       rs = (
         <i
           className="fa fa-circle"
@@ -86,7 +91,8 @@ function GamePage(props) {
       );
     } else if (
       r.item.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
-      r.item.send_recieved !== "0001-01-01T00:00:00Z"
+      r.item.send_recieved !== "0001-01-01T00:00:00Z" &&
+      r.item.status == 1
     ) {
       button = (
         <button
@@ -98,7 +104,7 @@ function GamePage(props) {
       );
     }
 
-    if (r.item.send_recieved !== "0001-01-01T00:00:00Z") {
+    if (r.item.send_recieved !== "0001-01-01T00:00:00Z" && r.item.status == 1) {
       sr = (
         <i
           className="fa fa-circle"
@@ -111,7 +117,8 @@ function GamePage(props) {
       );
     } else if (
       r.item.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
-      r.item.send_sent !== "0001-01-01T00:00:00Z"
+      r.item.send_sent !== "0001-01-01T00:00:00Z" &&
+      r.item.status == 1
     ) {
       button = (
         <button
@@ -123,7 +130,7 @@ function GamePage(props) {
       );
     }
 
-    if (r.item.send_sent !== "0001-01-01T00:00:00Z") {
+    if (r.item.send_sent !== "0001-01-01T00:00:00Z" && r.item.status == 1) {
       ss = (
         <i
           className="fa fa-circle"
@@ -133,7 +140,8 @@ function GamePage(props) {
         ></i>
       );
     } else if (
-      JSON.parse(localStorage.getItem("profile")).user_id === game.user_id
+      JSON.parse(localStorage.getItem("profile")).user_id === game.user_id &&
+      r.item.status == 1
     ) {
       button = (
         <button
@@ -143,8 +151,36 @@ function GamePage(props) {
           Send Out
         </button>
       );
+    } else if (
+      r.item.status != "1" &&
+      JSON.parse(localStorage.getItem("profile")).user_id === game.user_id
+    ) {
+      button = (
+        <div>
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => {
+              Request.setStatus(r.item._id, 1).then(data => {
+                getGame();
+              });
+            }}
+          >
+            Accept
+          </button>
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => {
+              Request.setStatus(r.item._id, 2).then(data => {
+                getGame();
+              });
+            }}
+          >
+            Decline
+          </button>
+        </div>
+      );
     }
-    if (r.item.user_name) {
+    if (r.item.user_name && r.item.status !== 2) {
       return (
         <div className="item">
           <div className="row">
@@ -169,6 +205,14 @@ function GamePage(props) {
           </div>
         </div>
       );
+    } else if (r.item.user_name && r.item.status === 2) {
+      return (
+        <div className="item">
+          <div className="row">
+            <div className="col-sm-12">{r.item.user_name} - Declined</div>
+          </div>
+        </div>
+      );
     } else {
       return null;
     }
@@ -178,6 +222,7 @@ function GamePage(props) {
     return <div>Play: {p.user_name}</div>;
   }
   function handleNewRequestClick() {
+    setShowRequest(false);
     Request.addRequest(gameId).then(res => {
       console.log("request return", res.data);
       getGame();
@@ -196,18 +241,33 @@ function GamePage(props) {
 
   function RequestButton() {
     if (game.user_id !== JSON.parse(localStorage.getItem("profile")).user_id) {
-      return (
-        <div className="col-sm">
-          <a
-            href="#"
-            className="btn btn-block btn-primary mt-2"
-            onClick={() => handleNewRequestClick()}
-          >
-            <i className="fa fa-share-square"></i>
-            <br /> Request This Game
-          </a>
-        </div>
-      );
+      if (showrequest !== false) {
+        return (
+          <div className="col-sm">
+            <a
+              href="#"
+              className="btn btn-block btn-primary mt-2"
+              onClick={() => handleNewRequestClick()}
+            >
+              <i className="fa fa-share-square"></i>
+              <br /> Request This Game
+            </a>
+          </div>
+        );
+      } else {
+        return (
+          <div className="col-sm">
+            <button
+              href="#"
+              className="btn btn-block btn-primary mt-2"
+              disabled
+            >
+              <i className="fa fa-share-square"></i>
+              <br /> Request This Game
+            </button>
+          </div>
+        );
+      }
     } else {
       return (
         <div className="col-sm">

@@ -77,6 +77,15 @@ const Request = {
         headers: this.auth_headers
       }
     );
+  },
+  setStatus(requestId, setstatus) {
+    return axios.post(
+      this.host + "/Request/" + requestId,
+      { status: setstatus },
+      {
+        headers: this.auth_headers
+      }
+    );
   }
 };
 
