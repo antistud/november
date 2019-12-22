@@ -8,22 +8,22 @@ function GameRequestItem(props) {
 
     //let [game, setGame] = useState();
     function markStep(step, requestId) {
-      if (step == "rr") {
+      if (step === "rr") {
         Request.markReturnAsRecieved(requestId).then(res => {
           console.log("rr", res);
           props.getGame();
         });
-      } else if (step == "rs") {
+      } else if (step === "rs") {
         Request.markReturnAsSent(requestId).then(res => {
           console.log("rs", res);
           props.getGame();
         });
-      } else if (step == "sr") {
+      } else if (step === "sr") {
         Request.markSendAsRecieved(requestId).then(res => {
           console.log("sr", res);
           props.getGame();
         });
-      } else if (step == "ss") {
+      } else if (step === "ss") {
         Request.markSendAsSent(requestId).then(res => {
           console.log("ss", res);
           props.getGame();
@@ -37,7 +37,7 @@ function GameRequestItem(props) {
     let sr = <i className="far fa-circle"></i>;
     let ss = <i className="far fa-circle"></i>;
     let button = "";
-    if (item.return_recieved !== "0001-01-01T00:00:00Z" && item.status == 1) {
+    if (item.return_recieved !== "0001-01-01T00:00:00Z" && item.status === 1) {
       rr = (
         <i
           className="fa fa-circle"
@@ -52,7 +52,7 @@ function GameRequestItem(props) {
       props.game.user_id ===
         JSON.parse(localStorage.getItem("profile")).user_id &&
       item.return_sent !== "0001-01-01T00:00:00Z" &&
-      item.status == 1
+      item.status === 1
     ) {
       button = (
         <button
@@ -64,7 +64,7 @@ function GameRequestItem(props) {
       );
     }
 
-    if (item.return_sent !== "0001-01-01T00:00:00Z" && item.status == 1) {
+    if (item.return_sent !== "0001-01-01T00:00:00Z" && item.status === 1) {
       rs = (
         <i
           className="fa fa-circle"
@@ -76,7 +76,7 @@ function GameRequestItem(props) {
     } else if (
       item.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
       item.send_recieved !== "0001-01-01T00:00:00Z" &&
-      item.status == 1
+      item.status === 1
     ) {
       button = (
         <button
@@ -88,7 +88,7 @@ function GameRequestItem(props) {
       );
     }
 
-    if (item.send_recieved !== "0001-01-01T00:00:00Z" && item.status == 1) {
+    if (item.send_recieved !== "0001-01-01T00:00:00Z" && item.status === 1) {
       sr = (
         <i
           className="fa fa-circle"
@@ -102,7 +102,7 @@ function GameRequestItem(props) {
     } else if (
       item.user_id === JSON.parse(localStorage.getItem("profile")).user_id &&
       item.send_sent !== "0001-01-01T00:00:00Z" &&
-      item.status == 1
+      item.status === 1
     ) {
       button = (
         <button
@@ -114,7 +114,7 @@ function GameRequestItem(props) {
       );
     }
 
-    if (item.send_sent !== "0001-01-01T00:00:00Z" && item.status == 1) {
+    if (item.send_sent !== "0001-01-01T00:00:00Z" && item.status === 1) {
       ss = (
         <i
           className="fa fa-circle"
@@ -126,7 +126,7 @@ function GameRequestItem(props) {
     } else if (
       JSON.parse(localStorage.getItem("profile")).user_id ===
         props.game.user_id &&
-      item.status == 1
+      item.status === 1
     ) {
       button = (
         <button
