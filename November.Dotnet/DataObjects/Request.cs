@@ -37,6 +37,7 @@ namespace November.Dotnet
             return_recieved = r.return_recieved;
             requester_rating = r.requester_rating;
             lender_rating = r.lender_rating;
+            status = r.status;
         }
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -53,7 +54,7 @@ namespace November.Dotnet
         public DateTime return_sent { get; set; }
         public DateTime return_recieved { get; set; }
         public int requester_rating { get; set; }
-        public int lender_rating { get; set; } 
+        public int lender_rating { get; set; }
         public int status { get; set; }
     }
     public class GameRequestPut
@@ -75,7 +76,7 @@ namespace November.Dotnet
         public string step { get; set; }
         public int requester_rating { get; set; }
         public int lender_rating { get; set; }
-        public int status {get; set;}
+        public int status { get; set; }
     }
     public class GameRequestReturn
     {
