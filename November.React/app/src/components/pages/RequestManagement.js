@@ -4,9 +4,10 @@ import { CardColumns, Card, Col } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import Moment from "react-moment";
 import Game from "../../services/game";
-
+import _ from "lodash";
 import "react-step-progress-bar/styles.css";
 import { ProgressBar, Step } from "react-step-progress-bar";
+
 function RequestManagement() {
   let [state, setState] = useState();
   let [profile, setProfile] = useState(
@@ -26,7 +27,14 @@ function RequestManagement() {
       setProfile(JSON.parse(localStorage.getItem("profile")));
       console.log(res);
       if (res.data) {
-        setState({ requests: res.data });
+        setState({
+          requests: _.filter(res.data, x => {
+            return (
+              (x.status === 0 || x.status == 1) &&
+              x.return_recieved === "0001-01-01T00:00:00Z"
+            );
+          })
+        });
       }
     });
     console.log(profile);
@@ -35,7 +43,14 @@ function RequestManagement() {
     Request.getRequests().then(res => {
       console.log(res);
       if (res.data) {
-        setState({ requests: res.data });
+        setState({
+          requests: _.filter(res.data, x => {
+            return (
+              (x.status === 0 || x.status == 1) &&
+              x.return_recieved === "0001-01-01T00:00:00Z"
+            );
+          })
+        });
       }
     });
   }
