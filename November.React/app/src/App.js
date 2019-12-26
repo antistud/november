@@ -2,7 +2,11 @@ import React, { Component } from "react";
 import { Container } from "react-bootstrap";
 import "./App.css";
 import { library } from "@fortawesome/fontawesome-svg-core";
-import { faUserCircle, faUserEdit } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserCircle,
+  faUserEdit,
+  faWindowRestore
+} from "@fortawesome/free-solid-svg-icons";
 import {
   BrowserRouter as Router,
   Route,
@@ -115,8 +119,8 @@ class App extends Component {
         if (response.data !== "missing or wrong password") {
           localStorage.setItem("apiKey", response.data);
           this.setState({ apiKey: response.data });
-
           this.getProfile();
+          window.location = "/";
         } else {
           alert("Credentials unrecognized. Please try again!");
         }
