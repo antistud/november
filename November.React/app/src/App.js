@@ -29,6 +29,7 @@ import Login from "./components/pages/Login";
 import GamePage from "./components/pages/GamePage";
 import RequestManagement from "./components/pages/RequestManagement";
 import AppFooter from "./components/AppFooter";
+import _ from "lodash";
 
 library.add(faUserCircle, faUserEdit);
 class App extends Component {
@@ -91,6 +92,7 @@ class App extends Component {
         for (let g2 in response2.data) {
           games.push(response2.data[g2]);
         }
+        games = _.sortBy(games, "atlas.name");
         this.setState({
           gamelibrary: games,
           stats: { count: { all: games.length } }

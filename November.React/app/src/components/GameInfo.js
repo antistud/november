@@ -21,7 +21,9 @@ function GameInfo(props) {
         ></i>
       );
     } else if (hidebutton != gameId) {
-      return <div>Added</div>;
+      return <div>Owned</div>;
+    } else {
+      return <div> Added </div>;
     }
   }
   function getLibraryIds() {

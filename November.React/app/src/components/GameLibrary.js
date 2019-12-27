@@ -59,8 +59,9 @@ export class GameLibrary extends Component {
 
   profileCheck() {
     if (
-      JSON.parse(localStorage.getItem("profile")).name == null ||
-      JSON.parse(localStorage.getItem("profile")).name == ""
+      JSON.parse(localStorage.getItem("profile")).username &&
+      (JSON.parse(localStorage.getItem("profile")).name == null ||
+        JSON.parse(localStorage.getItem("profile")).name == "")
     ) {
       return (
         <div>
@@ -87,7 +88,7 @@ export class GameLibrary extends Component {
             -1)
       );
     });
-    if (this.props.gamelibrary !== []) {
+    if (this.props.gamelibrary !== [] && this.props.gamelibrary !== null) {
       return (
         <React.Fragment>
           <div className="input-group mb-3">
