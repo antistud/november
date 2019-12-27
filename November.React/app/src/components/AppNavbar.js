@@ -6,8 +6,10 @@ export class AppNavbar extends Component {
   logout = e => {
     Auth.logout(this.props.apiKey).then(res => {
       localStorage.removeItem("apiKey");
-      this.props.loggedIn(false);
+      localStorage.removeItem("profile");
+      localStorage.removeItem("gamelibrary");
     });
+    this.props.loggedIn(false);
   };
 
   loginbutton() {

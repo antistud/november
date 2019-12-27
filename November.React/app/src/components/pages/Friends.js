@@ -2,6 +2,7 @@ import React, { Component, useEffect, useState } from "react";
 import User from "../../services/user";
 import Auth from "../../services/auth";
 import { Typeahead } from "react-bootstrap-typeahead";
+import _ from "lodash";
 
 function Friends() {
   let [friends, setFriends] = useState();
@@ -14,13 +15,20 @@ function Friends() {
   }, []);
 
   function getFriends() {
+    if (localStorage.getItem("friends")) {
+      setFriends(JSON.parse(localStorage.getItem("friends")));
+    }
     User.getFriends().then(res => {
       setFriends(res.data);
       console.log("Friends", res.data);
+      localStorage.setItem("friends", JSON.stringify(res.data));
       getUsers();
     });
   }
   function getUsers() {
+    // if (localStorage.getItem("otherUsers")) {
+    //   setFriends(JSON.parse(localStorage.getItem("otherUsers")));
+    // }
     User.getUsers().then(res => {
       let users = [];
       for (let u of res.data) {
@@ -28,7 +36,11 @@ function Friends() {
           users.push(u);
         }
       }
-      setUsers(users);
+      // localStorage.setItem(
+      //   "otherUsers",
+      //   JSON.stringify(_.filter(users, "name"))
+      // );
+      setUsers(_.filter(users, "name"));
       console.log("Users", res.data);
     });
   }
