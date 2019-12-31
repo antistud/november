@@ -2,17 +2,19 @@ import React, { useEffect, useState } from "react";
 import { Table, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useHistory, useRouteMatch } from "react-router-dom";
-import User from "../../services/user"
+import User from "../../services/user";
 function Profile(props) {
   let [profile, setProfile] = useState();
 
   useEffect(() => {
-    console.log(profile)
+    console.log(profile);
 
-    User.getProfile().then(res => { console.log(res); setProfile(res.data) })
+    User.getProfile().then(res => {
+      console.log(res);
+      setProfile(res.data);
+    });
 
-    console.log('useEffect invoked');
-
+    console.log("useEffect invoked");
   }, []);
   let history = useHistory();
   let { url } = useRouteMatch();
@@ -20,7 +22,6 @@ function Profile(props) {
     history.push(`${url}/edit`);
   }
   if (profile) {
-
     return (
       <React.Fragment>
         <div>
@@ -48,9 +49,7 @@ function Profile(props) {
             </tr>
             <tr>
               <th>Address</th>
-              <th>
-                {profile.address}
-              </th>
+              <th>{profile.address}</th>
             </tr>
             <tr>
               <th>City</th>
@@ -64,15 +63,14 @@ function Profile(props) {
 
           {/* <tbody>{this.props.renderTableData()}</tbody> */}
         </Table>
+        <Button variant="primary" onClick={handleClick}>
+          Reset Password
+        </Button>
       </React.Fragment>
     );
+  } else {
+    return <div>Loading...</div>;
   }
-  else {
-    return (
-      <div>Loading...</div>
-    )
-  }
-
 }
 
 export default Profile;
