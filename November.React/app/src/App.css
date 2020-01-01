@@ -31,11 +31,36 @@ a {
   padding-top: 50px;
   font-size: x-large;
 }
+.gameDetails {
+  font-family: "Ubuntu Condensed", sans-serif;
+}
 
-.gameDetails img {
-  height: 280px;
+.gameDetails .card-title {
+  font-family: "Ubuntu", sans-serif;
+}
+
+.card-img-top img {
+  height: 200px;
+  width: 100%;
   object-fit: cover;
   object-position: 0 10%;
+  transition: 0.5s ease;
+}
+.card-img-top:active img {
+  background-color: white;
+  height: 280px;
+  padding: 20px;
+  background: white;
+  object-fit: contain;
+  object-position: 50% 50%;
+  transition: 0s ease-out;
+}
+
+.card-img-top {
+  text-align: center;
+  height: auto;
+  object-fit: cover;
+  background-color: white;
 }
 
 .card {

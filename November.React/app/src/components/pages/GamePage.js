@@ -49,14 +49,47 @@ function GamePage(props) {
         <div className="row">
           <div className="col-sm-7">
             <div className="card gameDetails">
-              <img src={game.atlas.image_url} className="card-img-top"></img>
+              <div className="card-img-top">
+                <img src={game.atlas.image_url}></img>
+              </div>
               <div className="card-body">
                 <h5 className="card-title">{game.atlas.name}</h5>
-                <p className="card-text">
-                  Publisher: {game.atlas.primary_publisher}
-                </p>
+                <div className="card-text">
+                  <b>Publisher:</b> {game.atlas.primary_publisher}
+                  <br />
+                  <b>Published:</b> {game.atlas.year_published}
+                  <br />
+                  <b>Players:</b> {game.atlas.min_players} -{" "}
+                  {game.atlas.max_players}
+                  <br />
+                  <b>Play Time:</b> {game.atlas.min_playtime} -{" "}
+                  {game.atlas.max_playtime}
+                  <br />
+                  <b>Ages:</b> {game.atlas.min_age}
+                  <br />
+                  <br />
+                  <br />
+                  <div
+                    dangerouslySetInnerHTML={{ __html: game.atlas.description }}
+                  ></div>
+                </div>
               </div>
-              <div className="card-footer text-right">More Details</div>
+              <div className="card-footer text-right">
+                <a
+                  className="btn btn-link"
+                  href={game.atlas.official_url}
+                  target="_blank"
+                >
+                  Official Link
+                </a>
+                <a
+                  className="btn btn-link"
+                  href={game.atlas.rules_url}
+                  target="_blank"
+                >
+                  Rules
+                </a>
+              </div>
             </div>
           </div>
           <div className="col-sm-5">

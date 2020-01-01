@@ -1,5 +1,6 @@
 import axios from "axios";
 import db from "./db";
+import ProfileResetPassword from "../components/ProfileResetPassword";
 
 const Auth = {
   host: db.host,
@@ -27,6 +28,13 @@ const Auth = {
     return axios.put(
       this.host + "/Auth",
       { email: email },
+      { headers: this.auth_headers }
+    );
+  },
+  resetPassword(oldpassword, newpassword) {
+    return axios.put(
+      this.host + "/Auth/Reset",
+      { password: oldpassword, newpassword: newpassword },
       { headers: this.auth_headers }
     );
   }
