@@ -57,13 +57,39 @@ function GamePage(props) {
                 <div className="card-text">
                   <b>Publisher:</b> {game.atlas.primary_publisher}
                   <br />
+                  <b>Published:</b> {game.atlas.year_published}
+                  <br />
+                  <b>Players:</b> {game.atlas.min_players} -{" "}
+                  {game.atlas.max_players}
+                  <br />
+                  <b>Play Time:</b> {game.atlas.min_playtime} -{" "}
+                  {game.atlas.max_playtime}
+                  <br />
+                  <b>Ages:</b> {game.atlas.min_age}
+                  <br />
+                  <br />
                   <br />
                   <div
                     dangerouslySetInnerHTML={{ __html: game.atlas.description }}
                   ></div>
                 </div>
               </div>
-              <div className="card-footer text-right"></div>
+              <div className="card-footer text-right">
+                <a
+                  className="btn btn-link"
+                  href={game.atlas.official_url}
+                  target="_blank"
+                >
+                  Official Link
+                </a>
+                <a
+                  className="btn btn-link"
+                  href={game.atlas.rules_url}
+                  target="_blank"
+                >
+                  Rules
+                </a>
+              </div>
             </div>
           </div>
           <div className="col-sm-5">
