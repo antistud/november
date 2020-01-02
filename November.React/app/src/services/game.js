@@ -24,7 +24,10 @@ const Game = {
   },
   getGameDetails(gameId) {
     return axios.get(
-      this.host + "/Game/" + gameId + "?atlas=true&play=true&request=true",
+      this.host +
+        "/Game/" +
+        gameId +
+        "?atlas=true&play=true&request=true&user=true",
       {
         headers: this.auth_headers
       }

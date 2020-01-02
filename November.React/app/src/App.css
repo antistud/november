@@ -38,6 +38,21 @@ a {
 .gameDetails .card-title {
   font-family: "Ubuntu", sans-serif;
 }
+.requestGameDetails .card-title {
+  height: 100px;
+  font-family: "Ubuntu", sans-serif;
+}
+.requestGameDetails .card-img-top {
+  height: 180px !important;
+  width: 100% !important;
+  object-fit: contain !important;
+  padding: 20px;
+}
+
+.requestGameDetails .card-text {
+  height: 130px;
+  padding-bottom: 20px !important;
+}
 
 .card-img-top img {
   height: 200px;
