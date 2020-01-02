@@ -19,6 +19,7 @@ function GamePage(props) {
   function getGame() {
     Game.getGameDetails(gameId).then(res => {
       setGame(res.data);
+      console.log("game", res.data);
     });
   }
 
@@ -55,6 +56,7 @@ function GamePage(props) {
               <div className="card-body">
                 <h5 className="card-title">{game.atlas.name}</h5>
                 <div className="card-text">
+                  @{}
                   <b>Publisher:</b> {game.atlas.primary_publisher}
                   <br />
                   <b>Published:</b> {game.atlas.year_published}

@@ -77,9 +77,16 @@ function RequestManagement() {
       });
     }
   }
-  function cardFooter(request) {
-    if (request.send_sent != "0001-01-01T00:00:00Z") {
-      return (
+
+  function setStatus(requestId, status) {
+    Request.setStatus(requestId, status).then(res => {
+      console.log(res.data);
+      reloadRequests();
+    });
+  }
+  function cardFooter(request, status) {
+    return (
+      <div className="requestFooter">
         <div className="d-flex justify-content-between">
           <small className="text-muted">
             <Moment fromNow>{request.send_sent}</Moment>
@@ -88,15 +95,43 @@ function RequestManagement() {
             <a onClick={() => onClick(request.game_id)}>More Info...</a>
           </small>
         </div>
-      );
-    }
+      </div>
+    );
   }
   function getGameState(request) {
     const incoming = request.user_id !== profile.user_id;
     let percent = 0;
     let status = "";
     let button = null;
-    if (request.return_recieved !== "0001-01-01T00:00:00Z") {
+    if (request.status == "0" && incoming) {
+      status = "Waiting for you to accept";
+      button = (
+        <div>
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => setStatus(request._id, 1)}
+          >
+            Accept
+          </button>
+          <button
+            className="btn btn-block btn-success"
+            onClick={() => setStatus(request._id, 2)}
+          >
+            Decline
+          </button>
+        </div>
+      );
+    } else if (request.status == "0" && !incoming) {
+      status = "Your request has been submitted";
+      button = (
+        <button
+          className="btn btn-block btn-success"
+          onClick={() => setStatus(request._id, 3)}
+        >
+          Cancel
+        </button>
+      );
+    } else if (request.return_recieved !== "0001-01-01T00:00:00Z") {
       percent = 100;
       status = "Game Returned";
     } else if (request.return_sent !== "0001-01-01T00:00:00Z") {
@@ -168,7 +203,7 @@ function RequestManagement() {
         let status = getGameState(request);
 
         return (
-          <Card className="gameDetails">
+          <Card className="requestGameDetails">
             <Card.Img
               className="card-holder-img"
               variant="top"
@@ -249,7 +284,7 @@ function RequestManagement() {
                   Status: {status.status} {status.button}
                 </span>
               </Card.Text>
-              {cardFooter(request)}
+              {cardFooter(request, status)}
             </Card.Body>
           </Card>
         );

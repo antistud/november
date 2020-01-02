@@ -309,7 +309,7 @@ namespace November.Dotnet.Controllers
         }
         [Route("{gameId}")]
         [HttpGet]
-        public IActionResult GetId(string gameId, [FromQuery] bool atlas, [FromQuery] bool play, [FromQuery] bool request)
+        public IActionResult GetId(string gameId, [FromQuery] bool atlas, [FromQuery] bool play, [FromQuery] bool request, [FromQuery] bool user)
         {
 
             Response.Headers.Add("Access-Control-Allow-Origin", "*");
@@ -360,9 +360,9 @@ namespace November.Dotnet.Controllers
                                     var req = new GamePlayDetail(r.q_play);
                                     try
                                     {
-                                        var user = r.q_profile.ToList().First();
-                                        req.user_username = user.username;
-                                        req.user_name = user.name;
+                                        var q_user = r.q_profile.ToList().First();
+                                        req.user_username = q_user.username;
+                                        req.user_name = q_user.name;
                                     }
                                     catch
                                     {
@@ -398,9 +398,9 @@ namespace November.Dotnet.Controllers
                                     var req = new GameRequestDetail(r.q_request);
                                     try
                                     {
-                                        var user = r.q_profile.ToList().First();
-                                        req.user_username = user.username;
-                                        req.user_name = user.name;
+                                        var q_user = r.q_profile.ToList().First();
+                                        req.user_username = q_user.username;
+                                        req.user_name = q_user.name;
                                     }
                                     catch
                                     {
@@ -410,6 +410,17 @@ namespace November.Dotnet.Controllers
 
                             }
                             docs.request = requestls;
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                    if (user == true)
+                    {
+                        try
+                        {
+                            docs.user = GetProfile(docs.user_id);
                         }
                         catch
                         {
