@@ -56,7 +56,15 @@ function GamePage(props) {
               <div className="card-body">
                 <h5 className="card-title">{game.atlas.name}</h5>
                 <div className="card-text">
-                  @{}
+                  <b>
+                    {" "}
+                    <a href={"/?u=" + game.user.username}>
+                      @{game.user.username}
+                    </a>
+                  </b>{" "}
+                  - {game.user.name}
+                  <br />
+                  <br />
                   <b>Publisher:</b> {game.atlas.primary_publisher}
                   <br />
                   <b>Published:</b> {game.atlas.year_published}
