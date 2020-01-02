@@ -34,8 +34,8 @@ export class GameLibrary extends Component {
     }
     console.log("render table data: ", props);
     const tableItems = props.gamelibrary.map(game => (
-      <tr onClick={() => navToGame(game._id)} key={game._id}>
-        <td className="tdimage">
+      <tr key={game._id}>
+        <td onClick={() => navToGame(game._id)} className="tdimage pointer">
           <Image
             key={game.atlas.images.small.toString()}
             className="gameImage"
@@ -43,9 +43,14 @@ export class GameLibrary extends Component {
           ></Image>
         </td>
         <td>
-          {game.atlas ? game.atlas.name : null}
+          <div className="pointer" onClick={() => navToGame(game._id)}>
+            {game.atlas ? game.atlas.name : null}
+          </div>
+
           <br />
-          <div>@{game.user ? game.user.username : null}</div>
+          <a href={"/?u=" + game.user.username}>
+            @{game.user ? game.user.username : null}
+          </a>
         </td>
       </tr>
     ));

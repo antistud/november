@@ -54,6 +54,9 @@ a {
   padding-bottom: 20px !important;
 }
 
+.pointer {
+  cursor: pointer;
+}
 .card-img-top img {
   height: 200px;
   width: 100%;
