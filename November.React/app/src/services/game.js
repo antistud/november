@@ -33,6 +33,15 @@ const Game = {
       }
     );
   },
+  setSatus(gameId, status) {
+    return axios.post(
+      this.host + "/Game",
+      { status: status, _id: gameId },
+      {
+        headers: this.auth_headers
+      }
+    );
+  },
   deleteGame(gameId) {
     return axios.delete(this.host + "/Game", {
       data: { _id: gameId },

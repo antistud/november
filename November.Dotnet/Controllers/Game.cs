@@ -137,36 +137,31 @@ namespace November.Dotnet.Controllers
 
             var id = ObjectId.Parse(body._id).ToString();
             var filter = Builders<UserGame>.Filter.Eq(x => x._id, id);
-            if (body._id == profile.user_id)
-            {
-                if (body.favorite == true)
-                {
-                    var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
-                    host.c_game.UpdateOneAsync(filter, update);
-                }
-                // 
-                if (body.atlas_id != null)
-                {
-                    var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
-                    host.c_game.UpdateOneAsync(filter, update);
-                }
 
-                if (body.bgg_id != null)
-                {
-                    var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
-                    host.c_game.UpdateOneAsync(filter, update);
-                }
-                if (body.status != 0)
-                {
-                    var update = Builders<UserGame>.Update.Set(x => x.status, body.status);
-                    host.c_game.UpdateOneAsync(filter, update);
-                }
-                return Ok("success");
-            }
-            else
+            if (body.favorite == true)
             {
-                return Ok("not your game");
+                var update = Builders<UserGame>.Update.Set(x => x.favorite, true);
+                host.c_game.UpdateOneAsync(filter, update);
             }
+            // 
+            if (body.atlas_id != null)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.atlas_id, body.atlas_id);
+                host.c_game.UpdateOneAsync(filter, update);
+            }
+
+            if (body.bgg_id != null)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.bgg_id, body.bgg_id);
+                host.c_game.UpdateOneAsync(filter, update);
+            }
+            if (body.status != 0)
+            {
+                var update = Builders<UserGame>.Update.Set(x => x.status, body.status);
+                host.c_game.UpdateOneAsync(filter, update);
+            }
+            return Ok("success");
+
             // Favorite
 
 
