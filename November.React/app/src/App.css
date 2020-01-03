@@ -54,6 +54,9 @@ a {
   padding-bottom: 20px !important;
 }
 
+.pointer {
+  cursor: pointer;
+}
 .card-img-top img {
   height: 200px;
   width: 100%;
@@ -61,9 +64,9 @@ a {
   object-position: 0 10%;
   transition: 0.5s ease;
 }
-.card-img-top:active img {
+.card-img-top.active img {
   background-color: white;
-  height: 280px;
+  height: 500px;
   padding: 20px;
   background: white;
   object-fit: contain;

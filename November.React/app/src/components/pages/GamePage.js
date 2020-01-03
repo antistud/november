@@ -5,10 +5,12 @@ import Game from "../../services/game";
 import GameRequestItem from "../GameRequestItem";
 import GameButtons from "../GameButtons";
 import Request from "../../services/request";
+import BootstrapSwitchButton from "bootstrap-switch-button-react";
 
 function GamePage(props) {
   let history = useHistory();
   let [game, setGame] = useState();
+  let [imageactive, setImageactive] = useState();
   let [showrequest, setShowRequest] = useState();
   let { gameId } = useParams();
   let { url } = useRouteMatch();
@@ -21,6 +23,48 @@ function GamePage(props) {
       setGame(res.data);
       console.log("game", res.data);
     });
+  }
+
+  function visibleSwitch() {
+    if (game.user_id == JSON.parse(localStorage.getItem("profile")).user_id) {
+      if (game.status == 1 || game.status == 0) {
+        return (
+          <BootstrapSwitchButton
+            checked={true}
+            onlabel="Visible"
+            offlabel="Hidden"
+            onChange={checked => {
+              if (checked == true) {
+                Game.setSatus(game._id, 1);
+              } else {
+                Game.setSatus(game._id, 2);
+              }
+            }}
+            size="sm"
+            width={100}
+          />
+        );
+      } else {
+        return (
+          <BootstrapSwitchButton
+            checked={false}
+            onlabel="Visible"
+            offlabel="Hidden"
+            onChange={checked => {
+              if (checked == true) {
+                Game.setSatus(game._id, 1);
+              } else {
+                Game.setSatus(game._id, 2);
+              }
+            }}
+            size="sm"
+            width={100}
+          />
+        );
+      }
+    } else {
+      return null;
+    }
   }
 
   function GamePlayItem(p) {
@@ -44,19 +88,38 @@ function GamePage(props) {
     });
   }
 
+  function toggleImageClass() {
+    setImageactive(!imageactive);
+  }
+
   if (game && game.atlas) {
     return (
       <div className="container">
         <div className="row">
           <div className="col-sm-7">
             <div className="card gameDetails">
-              <div className="card-img-top">
+              <div
+                className={imageactive ? "active card-img-top" : "card-img-top"}
+                onClick={toggleImageClass}
+              >
                 <img src={game.atlas.image_url}></img>
               </div>
               <div className="card-body">
-                <h5 className="card-title">{game.atlas.name}</h5>
+                <div className="card-title d-flex align-items-center">
+                  <h4 className="mr-auto p-3"> {game.atlas.name}</h4>
+                  {visibleSwitch()}
+                </div>
                 <div className="card-text">
-                  @{}
+                  {imageactive}
+                  <b>
+                    {" "}
+                    <a href={"/?u=" + game.user.username}>
+                      @{game.user.username}
+                    </a>
+                  </b>{" "}
+                  - {game.user.name}
+                  <br />
+                  <br />
                   <b>Publisher:</b> {game.atlas.primary_publisher}
                   <br />
                   <b>Published:</b> {game.atlas.year_published}

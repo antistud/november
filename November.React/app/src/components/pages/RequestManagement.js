@@ -28,12 +28,16 @@ function RequestManagement() {
       console.log(res);
       if (res.data) {
         setState({
-          requests: _.filter(res.data, x => {
-            return (
-              (x.status === 0 || x.status == 1) &&
-              x.return_recieved === "0001-01-01T00:00:00Z"
-            );
-          })
+          requests: _.orderBy(
+            _.filter(res.data, x => {
+              return (
+                (x.status === 0 || x.status == 1) &&
+                x.return_recieved === "0001-01-01T00:00:00Z"
+              );
+            }),
+            "_id",
+            "desc"
+          )
         });
       }
     });
@@ -89,7 +93,13 @@ function RequestManagement() {
       <div className="requestFooter">
         <div className="d-flex justify-content-between">
           <small className="text-muted">
-            <Moment fromNow>{request.send_sent}</Moment>
+            <Moment fromNow>
+              {
+                new Date(
+                  parseInt(request._id.toString().substring(0, 8), 16) * 1000
+                )
+              }
+            </Moment>
           </small>
           <small>
             <a onClick={() => onClick(request.game_id)}>More Info...</a>
