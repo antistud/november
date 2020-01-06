@@ -5,7 +5,7 @@ export default function About() {
     <React.Fragment>
       <h1>About</h1>
       <p>
-        This is the BoxSharing app version 1.0.0. It is part of our dev
+        This is the BoxSharing app version 1.0.1. It is part of our dev
         challenge.
       </p>
     </React.Fragment>
