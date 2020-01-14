@@ -125,7 +125,7 @@ function Friends() {
               <div>
                 {friend.user.name
                   ? friend.user.name
-                  : "Invited User - " + friend.user.username}
+                  : "Invited User - " + friend.user.email}
               </div>
               <div className="friendLink text-right">
                 <div className={friend.accepted ? "" : "hidden"}>
@@ -148,19 +148,17 @@ function Friends() {
   }
 
   function friendsList() {
-    let list = friends.map(friend => <div>{friendListCard(friend)}</div>);
+    let list = friends
+      .filter(friend => friend.user !== null)
+      .map(friend => <div>{friendListCard(friend)}</div>);
     return list;
   }
 
   if (friends && users) {
     return (
       <div>
-        <div className="input-group mb-3">
-          <div className="input-group-prepend">
-            <span className="input-group-text" id="basic-addon1">
-              Invite User:
-            </span>
-          </div>
+        <label for="typeaheadFriednSearch">Invite User</label>
+        <div className="input-group">
           <Typeahead
             ref={ref => setTypeahead(ref)}
             id="typeaheadFriednSearch"

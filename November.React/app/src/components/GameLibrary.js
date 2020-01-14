@@ -33,27 +33,29 @@ export class GameLibrary extends Component {
       history.push("/Game/" + gameId);
     }
     console.log("render table data: ", props);
-    const tableItems = props.gamelibrary.map(game => (
-      <tr key={game._id}>
-        <td onClick={() => navToGame(game._id)} className="tdimage pointer">
-          <Image
-            key={game.atlas.images.small.toString()}
-            className="gameImage"
-            src={game.atlas.images.small}
-          ></Image>
-        </td>
-        <td>
-          <div className="pointer" onClick={() => navToGame(game._id)}>
-            {game.atlas ? game.atlas.name : null}
-          </div>
+    const tableItems = props.gamelibrary
+      .filter(game => game.user !== null)
+      .map(game => (
+        <tr key={game._id}>
+          <td onClick={() => navToGame(game._id)} className="tdimage pointer">
+            <Image
+              key={game.atlas.images.small.toString()}
+              className="gameImage"
+              src={game.atlas.images.small}
+            ></Image>
+          </td>
+          <td>
+            <div className="pointer" onClick={() => navToGame(game._id)}>
+              {game.atlas ? game.atlas.name : null}
+            </div>
 
-          <br />
-          <a href={"/?u=" + game.user.username}>
-            @{game.user ? game.user.username : null}
-          </a>
-        </td>
-      </tr>
-    ));
+            <br />
+            <a href={game.user ? "/?u=" + game.user.username : null}>
+              @{game.user ? game.user.username : null}
+            </a>
+          </td>
+        </tr>
+      ));
     return <tbody>{tableItems}</tbody>;
   }
 
@@ -82,17 +84,19 @@ export class GameLibrary extends Component {
   }
 
   render() {
-    let filteredList = this.props.gamelibrary.filter(game => {
-      return (
-        (this.state.usernameSearch === null &&
-          game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !==
-            -1) ||
-        (this.state.usernameSearch !== null &&
-          game.user.username.toLowerCase() === this.state.usernameSearch &&
-          game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !==
-            -1)
-      );
-    });
+    let filteredList = this.props.gamelibrary
+      .filter(game => game.user !== null)
+      .filter(game => {
+        return (
+          (this.state.usernameSearch === null &&
+            game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !==
+              -1) ||
+          (this.state.usernameSearch !== null &&
+            game.user.username.toLowerCase() === this.state.usernameSearch &&
+            game.atlas.name.toLowerCase().indexOf(this.state.librarySearch) !==
+              -1)
+        );
+      });
     if (this.props.gamelibrary !== [] && this.props.gamelibrary !== null) {
       return (
         <React.Fragment>
@@ -137,9 +141,7 @@ export class GameLibrary extends Component {
               </div>
             </div>
           </div>
-          <div className="libraryTotal">
-            Games: {this.props.gamelibrary.length}
-          </div>
+          <div className="libraryTotal">Games: {filteredList.length}</div>
           <Table striped bordered hover>
             <thead>
               <tr>

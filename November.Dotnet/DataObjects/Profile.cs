@@ -23,14 +23,17 @@ namespace November.Dotnet
     }
     public class UserProfileSummary
     {
-        public UserProfileSummary(UserProfile p){
+        public UserProfileSummary(UserProfile p)
+        {
             user_id = p.user_id;
             username = p.username;
             name = p.name;
+            email = p.email;
         }
         [BsonRepresentation(BsonType.ObjectId)]
         public string user_id { get; set; }
         public string username { get; set; }
         public string name { get; set; }
+        public string email { get; set; }
     }
 }
